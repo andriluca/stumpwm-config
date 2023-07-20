@@ -43,73 +43,98 @@
 - [[#windows][WINDOWS]]
 
 * IMPORTANT MODULES TO LOAD FIRST
+The modules that are required for the UI to show important pieces of
+information and operate on input/output.
 ** Backlight
+Controlling brightness.
 #+begin_src lisp
   ;; Manage backlight
   (load-module "stump-backlight")
   (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
   (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
 #+end_src
+
 ** Battery
+Displaying battery level.
 #+begin_src lisp
   (load-module "battery-portable")
 #+end_src
+
 ** Completion
+Allowing "fuzzy" completion.
 #+begin_src lisp
   (ql:quickload :stumpwm-prescient)
   (setf *input-refine-candidates-fn* 'stumpwm-prescient:refine-input)
 #+end_src
+
 ** Keyboard Layouts
+Managing multiple keyboard layout.
 #+begin_src lisp
   (load-module "kbd-layouts")
 #+end_src
+
 ** Gaps
+Allowing gaps for better aesthetics.
 #+begin_src lisp
   ;; Gaps
   (load-module "swm-gaps")
 
   ;; Head gaps run along the 4 borders of the monitor(s)
-  (setf swm-gaps:*head-gaps-size* 40      ;; Head gaps run along the 4 borders of the monitor(s)
-        swm-gaps:*inner-gaps-size* 5      ;; Inner gaps run along all the 4 borders of a window
-        swm-gaps:*outer-gaps-size* 5)    ;; Outer gaps add more padding to the outermost borders of a window (touching
+  (setf swm-gaps:*head-gaps-size* 0        ;; Head gaps run along the 4 borders of the monitor(s)
+        swm-gaps:*inner-gaps-size* 13      ;; Inner gaps run along all the 4 borders of a window
+        swm-gaps:*outer-gaps-size* 7)      ;; Outer gaps add more padding to the outermost borders of a window (touching
   ;; the screen border)
 
   (swm-gaps:toggle-gaps)
 #+end_src
+
 ** Golden ratio
+Automatic window resizing when focused.
 #+begin_src lisp
   ;; Golden ratio (automatically resize windows)
   (load-module "swm-golden-ratio")
   (swm-golden-ratio:toggle-golden-ratio)
 #+end_src
+
 ** Memory usage
+Displaying memory usage.
 #+begin_src lisp
   (load-module "mem")
 #+end_src
+
 ** Network traffic
+Displaying network traffic.
 #+begin_src lisp
   (load-module "net")
 #+end_src
+
 ** Pomodoro timer
+Pomodoro timer to get productive.
 #+begin_src lisp
   (load-module "notifications")
   (load-module "swm-pomodoro")
   (setf swm-pomodoro:*bell-sound-file* "~/Music/bell.wav")
 #+end_src
+
 ** Session manager
+Managing the end of a session.
 #+begin_src lisp
   ;; Manage end of session
   (add-to-load-path #p"path-to-contrib/util/end-session")
   (load-module "end-session")
   (setf end-session:*end-session-command* "loginctl")
 #+end_src
+
 ** Slynk
+Creating a slynk server to connect to when performing tweaking.
 #+begin_src lisp
   (ql:quickload :slynk)
   (slynk:create-server
    :dont-close t)
 #+end_src
+
 ** Weather
+Displaying current weather information
 #+begin_src lisp
   (ql:quickload :stumpwm-weather)
 
@@ -123,11 +148,15 @@
         stumpwm-weather:*mode-line-formatter*   #\E)
   (stumpwm-weather:on)
 #+end_src
+
 ** WiFi
+Displaying wifi information.
 #+begin_src lisp
   (load-module "wifi")
 #+end_src
+
 ** Volume
+Managing volume level
 #+begin_src lisp
   ;; Manage volume
   (load-module "stump-volume-control")
@@ -137,6 +166,7 @@
 #+begin_src lisp
   (setf *input-completion-show-empty* t)
   #+end_src
+
 * FONT
 Abilitare i font ttf.
 #+begin_src lisp
@@ -155,9 +185,10 @@ Abilitare i font ttf.
                                 :antialias t)))))
 
 (or (set-font "-*-terminus-bold-r-normal-*-22-*-*-*-*-*-*-*")
-    (set-font "9x15bold"))
-
+   (set-font "9x15bold"))
+;; (set-font "Hack");;; Font
 #+end_src
+
 * HELPERS
 ** Colon
 #+begin_src lisp
@@ -197,31 +228,109 @@ Abilitare i font ttf.
 #+end_src
 
 * KEYBINDINGS
+Listed alphabetically (with respect to the keybinding).
 ** Applications
 #+begin_src lisp
-  ;; Emacs
-  (define-key *root-map* (kbd "e") "exec emacsclient -c")
+  ;; a todo
+  (define-key *root-map* (kbd "a") "exec alacritty -e alsamixer")
+  ;; b todo
+  (define-key *root-map* (kbd "b") "exec firefox")
   ;; Terminal
   (define-key *root-map* (kbd "c") "exec alacritty")
+  ;; d todo 
+  (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack'")
+  ;; Emacs
+  (define-key *root-map* (kbd "e") "exec emacsclient -c")
+  ;; f todo
+  (define-key *root-map* (kbd "f") "exec pcmanfm")
+  ;; F todo
+  (define-key *root-map* (kbd "F") "exec alacritty -e lf")
+  ;; g *GROUP-MAP* don't touch
+  ;; h *HELP-MAP*  don't touch
+  ;; i todo
+  ;; j todo
+  ;; k DELETE-WINDOW don't touch
+  ;; l fix?
+  ;; m lastmsg don't touch
+  ;; n pull-hidden-next don't touch
+  ;; o fnext don't touch
+  ;; p pull-hidden-previous don't touch
+  ;; P
+  (define-key *root-map* (kbd "P") "exec sioyek")
+  ;; q quit-confirm don't touch
+  ;; r iresize don't touch
+  ;; R don't touch
+  ;; s vsplit
+  ;; S hsplit
+  ;; t don't touch
+  ;; u todo
+  ;; v todo
+  ;; w todo
+  ;; x *EXCHANGE-WINDOW-MAP* don't touch
+  ;; y todo
+  ;; z todo
+  (define-key *root-map* (kbd "RET") "exec alacritty")
 #+end_src
+
 ** Search
+Managing the interfaces to different sources for information research.
 #+begin_src lisp
-;; Browse somewhere
-(define-key *root-map* (kbd "b") "colon1 exec firefox http://www.")
 ;; Various search
+(make-web-jump "archlinux"  "firefox https://wiki.archlinux.org/title/")
 (make-web-jump "duckduckgo" "firefox https://duckduckgo.com/?q=")
-(make-web-jump "wikipedia" "firefox http://www.wikipedia.org/wiki/")
+(make-web-jump "libgen"     "firefox http://libgen.li/index.php?req=")
+(make-web-jump "wikipedia"  "firefox http://www.wikipedia.org/wiki/")
 
 ;; C-t M-s is a terrble binding, but you get the idea.
+;; Browse somewhere
+(define-key *root-map* (kbd "M-a") "archlinux")
+(define-key *root-map* (kbd "M-b") "colon1 exec firefox http://www.")
 (define-key *root-map* (kbd "M-s") "duckduckgo")
+(define-key *root-map* (kbd "M-S") "libgen")
+;; Browse somewhere
+(define-key *root-map* (kbd "M-u") "colon1 exec firefox http://www.")
 (define-key *root-map* (kbd "M-w") "wikipedia")
 #+end_src
 ** System
+Keybindings for managing system.
 #+begin_src lisp
+  ;; C-a todo
+  ;; C-b banish don't touch
+  ;; C-c todo
+  ;; C-d todo
+  ;; C-e todo
+  ;; Fullscreen
+  (define-key *root-map* (kbd "C-f") "fullscreen")
+  (define-key *top-map* (kbd "s-f") "fullscreen")
+  ;; C-g don't touch
+  (define-key *top-map* (kbd "s-g") "toggle-golden-ratio")
+  ;; C-h don't touch
+  ;; C-i todo
+  ;; C-j todo
+  ;; C-k don't touch (fix?)
   ;; Lock screen
-  (define-key *root-map* (kbd "C-l") "exec xlock")
+  (define-key *root-map* (kbd "C-l") "exec slock")
+  ;; C-m fix, todo
+  ;; C-n don't touch
+  ;; Cycling groups
+  (define-key *root-map* (kbd "C-o") "gnext")
+  (define-key *root-map* (kbd "C-O") "gnext-with-window")
+  ;; C-p don't touch
+  ;; C-q todo
+  (define-key *root-map* (kbd "C-q") "logout")
+  ;; C-r todo
+  (define-key *root-map* (kbd "C-r") "restart-computer")
+  ;; C-s
+  (define-key *root-map* (kbd "C-s") "shutdown-computer")
   ;; ssh
-  (define-key *root-map* (kbd "C-s") "colon1 exec alacritty -e ssh ")
+  ;;  (define-key *root-map* (kbd "C-s") "colon1 exec alacritty -e ssh ")
+  ;; C-t
+  ;; C-u
+  ;; C-v
+  ;; C-w
+  ;; C-x
+  ;; C-y
+  ;; C-z
 #+end_src
 ** Volume
 #+begin_src lisp
@@ -246,6 +355,7 @@ Abilitare i font ttf.
       *mode-line-pad-y* 3
       *mode-line-pad-x* 15)
 #+end_src
+
 * SETTINGS
 #+begin_src lisp
   (set-prefix-key (kbd "C-t"))
@@ -266,6 +376,7 @@ Abilitare i font ttf.
         stumpwm::*float-window-border* 1
         stumpwm::*float-window-title-height* 1)
 #+end_src
+
 * THEME
 ** Colors
 #+begin_src lisp
@@ -285,6 +396,7 @@ Abilitare i font ttf.
   ;; Mostra la barra
   (mode-line)
   #+end_src
+
 * WINDOWS
 #+begin_src lisp
   (setf *input-window-gravity* :center

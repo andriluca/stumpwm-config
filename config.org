@@ -1,0 +1,295 @@
+#+TITLE: StumpWM Config
+#+AUTHOR: Luca Andriotto
+#+PROPERTY: header-args :tangle config
+#+auto_tangle: t
+#+DESCRIPTION: Il window manager che sto iniziando ad apprezzare.
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* Table of Contents :toc:
+- [[#important-modules-to-load-first][IMPORTANT MODULES TO LOAD FIRST]]
+  - [[#backlight][Backlight]]
+  - [[#battery][Battery]]
+  - [[#completion][Completion]]
+  - [[#keyboard-layouts][Keyboard Layouts]]
+  - [[#gaps][Gaps]]
+  - [[#golden-ratio][Golden ratio]]
+  - [[#memory-usage][Memory usage]]
+  - [[#network-traffic][Network traffic]]
+  - [[#pomodoro-timer][Pomodoro timer]]
+  - [[#session-manager][Session manager]]
+  - [[#slynk][Slynk]]
+  - [[#weather][Weather]]
+  - [[#wifi][WiFi]]
+  - [[#volume][Volume]]
+- [[#completion-1][COMPLETION]]
+- [[#font][FONT]]
+- [[#helpers][HELPERS]]
+  - [[#colon][Colon]]
+  - [[#keybindings][Keybindings]]
+  - [[#search][Search]]
+- [[#input-devices][INPUT DEVICES]]
+  - [[#keyboard][Keyboard]]
+  - [[#mouse][Mouse]]
+- [[#keybindings-1][KEYBINDINGS]]
+  - [[#applications][Applications]]
+  - [[#search-1][Search]]
+  - [[#system][System]]
+  - [[#volume-1][Volume]]
+- [[#modeline][MODELINE]]
+- [[#settings][SETTINGS]]
+- [[#theme][THEME]]
+  - [[#colors][Colors]]
+- [[#windows][WINDOWS]]
+
+* IMPORTANT MODULES TO LOAD FIRST
+** Backlight
+#+begin_src lisp
+  ;; Manage backlight
+  (load-module "stump-backlight")
+  (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
+  (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
+#+end_src
+** Battery
+#+begin_src lisp
+  (load-module "battery-portable")
+#+end_src
+** Completion
+#+begin_src lisp
+  (ql:quickload :stumpwm-prescient)
+  (setf *input-refine-candidates-fn* 'stumpwm-prescient:refine-input)
+#+end_src
+** Keyboard Layouts
+#+begin_src lisp
+  (load-module "kbd-layouts")
+#+end_src
+** Gaps
+#+begin_src lisp
+  ;; Gaps
+  (load-module "swm-gaps")
+
+  ;; Head gaps run along the 4 borders of the monitor(s)
+  (setf swm-gaps:*head-gaps-size* 40      ;; Head gaps run along the 4 borders of the monitor(s)
+        swm-gaps:*inner-gaps-size* 5      ;; Inner gaps run along all the 4 borders of a window
+        swm-gaps:*outer-gaps-size* 5)    ;; Outer gaps add more padding to the outermost borders of a window (touching
+  ;; the screen border)
+
+  (swm-gaps:toggle-gaps)
+#+end_src
+** Golden ratio
+#+begin_src lisp
+  ;; Golden ratio (automatically resize windows)
+  (load-module "swm-golden-ratio")
+  (swm-golden-ratio:toggle-golden-ratio)
+#+end_src
+** Memory usage
+#+begin_src lisp
+  (load-module "mem")
+#+end_src
+** Network traffic
+#+begin_src lisp
+  (load-module "net")
+#+end_src
+** Pomodoro timer
+#+begin_src lisp
+  (load-module "notifications")
+  (load-module "swm-pomodoro")
+  (setf swm-pomodoro:*bell-sound-file* "~/Music/bell.wav")
+#+end_src
+** Session manager
+#+begin_src lisp
+  ;; Manage end of session
+  (add-to-load-path #p"path-to-contrib/util/end-session")
+  (load-module "end-session")
+  (setf end-session:*end-session-command* "loginctl")
+#+end_src
+** Slynk
+#+begin_src lisp
+  (ql:quickload :slynk)
+  (slynk:create-server
+   :dont-close t)
+#+end_src
+** Weather
+#+begin_src lisp
+  (ql:quickload :stumpwm-weather)
+
+  (setf stumpwm-weather:*open-weather-map-api-key*
+        "52a1bf7387593e8ab895b2104f9c0de8"
+      
+        stumpwm-weather:*units*                 "metric"
+        stumpwm-weather:*time-format-str*       "%H:%M:%S"
+        stumpwm-weather:*location*              "20129,it"
+        stumpwm-weather:*format-str*            "Name: %n | Hum: %H% | Weath: %d | Tmin %T | Tmax %h"
+        stumpwm-weather:*mode-line-formatter*   #\E)
+  (stumpwm-weather:on)
+#+end_src
+** WiFi
+#+begin_src lisp
+  (load-module "wifi")
+#+end_src
+** Volume
+#+begin_src lisp
+  ;; Manage volume
+  (load-module "stump-volume-control")
+#+end_src
+
+* COMPLETION
+#+begin_src lisp
+  (setf *input-completion-show-empty* t)
+  #+end_src
+* FONT
+Abilitare i font ttf.
+#+begin_src lisp
+  ;; Message window font
+  ;; (set-font "-xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso8859-15");;; Font
+(ql:quickload :clx-truetype)
+
+(let ((parent-font "Hack"))
+  (when (find parent-font (the list (clx-truetype:get-font-families))
+              :test #'string=)
+    (load-module "ttf-fonts")
+    (set-font `(,(make-instance 'xft:font
+                                :family "Hack"
+                                :subfamily "Regular"
+                                :size 11
+                                :antialias t)))))
+
+(or (set-font "-*-terminus-bold-r-normal-*-22-*-*-*-*-*-*-*")
+    (set-font "9x15bold"))
+
+#+end_src
+* HELPERS
+** Colon
+#+begin_src lisp
+  ;; prompt the user for an interactive command. The first arg is an
+  ;; optional initial contents.
+  (defcommand colon1 (&optional (initial "")) (:rest)
+    (let ((cmd (read-one-line (current-screen) ": " :initial-input initial)))
+      (when cmd
+        (eval-command cmd t))))
+#+end_src
+** Keybindings
+#+begin_src lisp
+  (defun tr-define-key (key command)
+    (define-key *top-map* (kbd (concat "s-" key )) command)
+    (define-key *root-map* (kbd key) command))
+#+end_src
+** Search
+#+begin_src lisp
+;; Web jump (works for DuckDuckGo and Imdb)
+(defmacro make-web-jump (name prefix)
+  `(defcommand ,(intern name) (search) ((:rest ,(concatenate 'string name " search: ")))
+    (nsubstitute #\+ #\Space search)
+    (run-shell-command (concatenate 'string ,prefix search))))
+#+end_src
+
+* INPUT DEVICES
+** Keyboard
+#+begin_src lisp
+  ;; Set keyboard layout
+  (setf kbd-layouts:*caps-lock-behavior* :swapped)
+  (kbd-layouts:keyboard-layout-list "us -variant workman" "it")
+#+end_src
+** Mouse
+#+begin_src lisp
+  ;; Focus Follow Mouse
+  (setf *mouse-focus-policy* :sloppy)
+#+end_src
+
+* KEYBINDINGS
+** Applications
+#+begin_src lisp
+  ;; Emacs
+  (define-key *root-map* (kbd "e") "exec emacsclient -c")
+  ;; Terminal
+  (define-key *root-map* (kbd "c") "exec alacritty")
+#+end_src
+** Search
+#+begin_src lisp
+;; Browse somewhere
+(define-key *root-map* (kbd "b") "colon1 exec firefox http://www.")
+;; Various search
+(make-web-jump "duckduckgo" "firefox https://duckduckgo.com/?q=")
+(make-web-jump "wikipedia" "firefox http://www.wikipedia.org/wiki/")
+
+;; C-t M-s is a terrble binding, but you get the idea.
+(define-key *root-map* (kbd "M-s") "duckduckgo")
+(define-key *root-map* (kbd "M-w") "wikipedia")
+#+end_src
+** System
+#+begin_src lisp
+  ;; Lock screen
+  (define-key *root-map* (kbd "C-l") "exec xlock")
+  ;; ssh
+  (define-key *root-map* (kbd "C-s") "colon1 exec alacritty -e ssh ")
+#+end_src
+** Volume
+#+begin_src lisp
+  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "volume-up")
+  (define-key *top-map* (kbd "XF86AudioLowerVolume") "volume-down")
+  (define-key *top-map* (kbd "XF86AudioMute") "volume-toggle-mute")
+#+end_src
+
+* MODELINE
+#+begin_src lisp
+;; Ordine di comparsa
+(setf stumpwm:*screen-mode-line-format*
+      (list "^7[^B^4%n^7^b]"
+	    " %v"
+	    "^>"                        ; Push right
+	    ;;	    " | %I"
+	    " | NET: %l"
+	    " | %M"
+	    " | %E"
+	    " | BAT: %B"
+	    " | CLK: %d")
+      *mode-line-pad-y* 3
+      *mode-line-pad-x* 15)
+#+end_src
+* SETTINGS
+#+begin_src lisp
+  (set-prefix-key (kbd "C-t"))
+
+  ;;; Font
+  ;;; Basic Settings
+  (setf *window-format* "%m%s%50t")
+  (setf *mode-line-background-color* (car *colors*)
+        ,*mode-line-foreground-color* (car (last *colors*))
+        ,*mode-line-timeout* 1)
+
+  (setf *message-window-gravity* :center
+        ,*window-border-style* :thin
+        ,*message-window-padding* 3
+        ,*maxsize-border-width* 2
+        ,*normal-border-width* 2
+        ,*transient-border-width* 2
+        stumpwm::*float-window-border* 1
+        stumpwm::*float-window-title-height* 1)
+#+end_src
+* THEME
+** Colors
+#+begin_src lisp
+  ;;; Theme
+  (setf *colors*
+        '("#000000"   ;black
+          "#BF6262"   ;red
+          "#a1bf78"   ;green
+          "#dbb774"   ;yellow
+          "#7D8FA3"   ;blue
+          "#ff99ff"   ;magenta
+          "#53cdbd"   ;cyan
+          "#ffffff")) ;white
+
+  (update-color-map (current-screen))
+
+  ;; Mostra la barra
+  (mode-line)
+  #+end_src
+* WINDOWS
+#+begin_src lisp
+  (setf *input-window-gravity* :center
+      ;; TODO determin why this appears above
+      *message-window-input-gravity* :left)
+  ;; Clear rules
+  (clear-window-placement-rules)
+#+end_src

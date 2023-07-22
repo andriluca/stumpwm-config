@@ -7,44 +7,83 @@
 #+OPTIONS: toc:2
 
 * Table of Contents :toc:
+- [[#important-initializations][IMPORTANT INITIALIZATIONS]]
+  - [[#groups][Groups]]
+  - [[#runners][Runners]]
 - [[#important-modules-to-load-first][IMPORTANT MODULES TO LOAD FIRST]]
   - [[#backlight][Backlight]]
   - [[#battery][Battery]]
   - [[#completion][Completion]]
+  - [[#font][Font]]
   - [[#keyboard-layouts][Keyboard Layouts]]
   - [[#gaps][Gaps]]
   - [[#golden-ratio][Golden ratio]]
+  - [[#hostname][Hostname]]
   - [[#memory-usage][Memory usage]]
   - [[#network-traffic][Network traffic]]
   - [[#pomodoro-timer][Pomodoro timer]]
   - [[#session-manager][Session manager]]
   - [[#slynk][Slynk]]
+  - [[#tray][Tray]]
   - [[#weather][Weather]]
   - [[#wifi][WiFi]]
   - [[#volume][Volume]]
+- [[#color-themes][COLOR THEME(S)]]
+  - [[#desktop-background][Desktop background]]
+  - [[#system][System]]
+  - [[#message-box][Message box]]
 - [[#completion-1][COMPLETION]]
-- [[#font][FONT]]
+- [[#font-1][FONT]]
 - [[#helpers][HELPERS]]
   - [[#colon][Colon]]
   - [[#keybindings][Keybindings]]
   - [[#search][Search]]
 - [[#input-devices][INPUT DEVICES]]
   - [[#keyboard][Keyboard]]
-  - [[#mouse][Mouse]]
+  - [[#mouse-trackpad][Mouse (Trackpad)]]
 - [[#keybindings-1][KEYBINDINGS]]
   - [[#applications][Applications]]
   - [[#search-1][Search]]
-  - [[#system][System]]
+  - [[#system-1][System]]
   - [[#volume-1][Volume]]
 - [[#modeline][MODELINE]]
+- [[#session][SESSION]]
 - [[#settings][SETTINGS]]
 - [[#theme][THEME]]
-  - [[#colors][Colors]]
+  - [[#borders][Borders]]
+  - [[#messageinput-box][Message/input box]]
 - [[#windows][WINDOWS]]
+- [[#window-placements][WINDOW PLACEMENTS]]
 
-* IMPORTANT MODULES TO LOAD FIRST
+* TODO IMPORTANT INITIALIZATIONS
+Metterei i define dei temi, di tutti i parametri, organizzati per risorsa, le funzioni helper e i runners.
+** Groups
+#+begin_src lisp
+  (in-package :stumpwm)
+
+  ;; creating groups
+  (setf (group-name (first (screen-groups (current-screen)))) "web")
+  (gnewbg "dev")
+  (gnewbg "read")
+  (gnewbg "relax")
+#+end_src
+
+** Runners
+This section gathers all the program wrappers.
+#+begin_src lisp
+  ;; Editor
+  (defcommand editor () ()
+    "run emacs"
+    (run-or-raise "emacsclient -c" '(:class "Emacs")))
+  (defcommand browser () ()
+    "run firefox"
+    (run-or-raise "firefox" '(:class "firefox")))
+#+end_src
+
+* TODO IMPORTANT MODULES TO LOAD FIRST
 The modules that are required for the UI to show important pieces of
-information and operate on input/output.
+information and operate on input/output. Metterei gli include dei
+moduli in un solo blocco di codice.
 ** Backlight
 Controlling brightness.
 #+begin_src lisp
@@ -65,6 +104,13 @@ Allowing "fuzzy" completion.
 #+begin_src lisp
   (ql:quickload :stumpwm-prescient)
   (setf *input-refine-candidates-fn* 'stumpwm-prescient:refine-input)
+#+end_src
+
+** Font
+Using a [[https://github.com/jamesmccabe/clx-truetype][fork]] from clx-truetype.
+#+begin_src lisp
+  (ql:quickload :clx-truetype)
+  (load-module "ttf-fonts")
 #+end_src
 
 ** Keyboard Layouts
@@ -94,6 +140,11 @@ Automatic window resizing when focused.
   ;; Golden ratio (automatically resize windows)
   (load-module "swm-golden-ratio")
   (swm-golden-ratio:toggle-golden-ratio)
+#+end_src
+
+** Hostname
+#+begin_src lisp
+  (load-module "hostname")
 #+end_src
 
 ** Memory usage
@@ -133,6 +184,11 @@ Creating a slynk server to connect to when performing tweaking.
    :dont-close t)
 #+end_src
 
+** Tray
+#+begin_src lisp
+  (load-module "stumptray")
+#+end_src
+
 ** Weather
 Displaying current weather information
 #+begin_src lisp
@@ -162,34 +218,85 @@ Managing volume level
   (load-module "stump-volume-control")
 #+end_src
 
-* COMPLETION
+* TODO COLOR THEME(S)
+** Desktop background
+#+begin_src lisp
+  ;; set desktop background color
+  (setf (xlib:window-background (screen-root (current-screen))) #x47456d)
+#+end_src
+
+** System
+#+begin_src lisp
+       ;;; Theme
+       ;;; Gavin
+    ;; (setf *colors*
+    ;;       '("#000000"   ;black
+    ;;         "#BF6262"   ;red
+    ;;         "#a1bf78"   ;green
+    ;;         "#dbb774"   ;yellow
+    ;;         "#7D8FA3"   ;blue
+    ;;         "#ff99ff"   ;magenta
+    ;;         "#53cdbd"   ;cyan
+    ;;         "#ffffff")) ;white
+
+    (setf *colors*
+          '("#ffffff"        ; ^0 ; White
+            "#131220"        ; ^1 ; Dark Blue
+            "#ff99ff"        ; ^2 ; Magenta
+            "#689d6a"        ; ^3 ; Light Green
+            "#62bfef"        ; ^4 ; Light Blue
+            "#fabd2f"        ; ^5 ; Yellow / Help map keys
+            "#f72f33"        ; ^6 ; Red
+            ;; "#a644bf"     ; ^6 ; Old magenta
+            "#cc4a0e"        ; ^7 ; Brown
+            "#56b6c2"))      ; ^8 ; Cyan 
+
+    (defparameter *mode-line-bg-color* (nth 1 *colors*))
+    (defparameter *mode-line-fg-color* (nth 0 *colors*))
+
+    (update-color-map (current-screen))
+
+    ;; Mostra la barra
+    (mode-line)
+  #+end_src
+
+** Message box
+#+begin_src lisp
+  (defparameter *msg-bg-color* (nth 1 *colors*))
+  (defparameter *msg-fg-color* (nth 0 *colors*))
+  (defparameter *msg-border-color* (nth 2 *colors*))
+  ;; message timeout
+  (setf *timeout-wait* 3)
+#+end_src
+
+* TODO COMPLETION
+Muovere in SETTINGS
 #+begin_src lisp
   (setf *input-completion-show-empty* t)
   #+end_src
 
-* FONT
-Abilitare i font ttf.
+* TODO FONT
+Abilitare i font ttf. Separare la parte di inizializzazione da quella di configurazione (dividere tra INITIALIZATIONS e SETTINGS.
 #+begin_src lisp
-  ;; Message window font
-  ;; (set-font "-xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso8859-15");;; Font
-(ql:quickload :clx-truetype)
+  ;; Caching the fonts
+  (setq clx-truetype::*font-dirs*
+        (append (list (namestring (merge-pathnames ".local/share/fonts" (user-homedir-pathname))))
+                clx-truetype::*font-dirs*))
+  (set-font (list
+	   (make-instance 'xft:font
+			  :family "Hack"
+			  :subfamily "Bold"
+			  :size 13)
+	   (make-instance 'xft:font
+			  :family "FontAwesome"
+			  :subfamily "Regular"
+			  :size 12)))
+  (xft:cache-fonts)
 
-(let ((parent-font "Hack"))
-  (when (find parent-font (the list (clx-truetype:get-font-families))
-              :test #'string=)
-    (load-module "ttf-fonts")
-    (set-font `(,(make-instance 'xft:font
-                                :family "Hack"
-                                :subfamily "Regular"
-                                :size 11
-                                :antialias t)))))
-
-(or (set-font "-*-terminus-bold-r-normal-*-22-*-*-*-*-*-*-*")
-   (set-font "9x15bold"))
-;; (set-font "Hack");;; Font
 #+end_src
 
-* HELPERS
+* TODO HELPERS
+Muovere in INITIALIZATION.
 ** Colon
 #+begin_src lisp
   ;; prompt the user for an interactive command. The first arg is an
@@ -214,36 +321,39 @@ Abilitare i font ttf.
     (run-shell-command (concatenate 'string ,prefix search))))
 #+end_src
 
-* INPUT DEVICES
+* TODO INPUT DEVICES
+Muovere in SETTINGS mantenendo l'albero.
 ** Keyboard
 #+begin_src lisp
   ;; Set keyboard layout
   (setf kbd-layouts:*caps-lock-behavior* :swapped)
   (kbd-layouts:keyboard-layout-list "us -variant workman" "it")
 #+end_src
-** Mouse
+** Mouse (Trackpad)
 #+begin_src lisp
   ;; Focus Follow Mouse
-  (setf *mouse-focus-policy* :sloppy)
+  (setf *mouse-focus-policy* :click)
+  ;; bugfix for scrolling doesn't work with an external mouse in GTK+3 Apps
+  (setf (getenv "GDK_CORE_DEVICE_EVENTS") "1")
 #+end_src
 
-* KEYBINDINGS
-Listed alphabetically (with respect to the keybinding).
+* TODO KEYBINDINGS
+Listed alphabetically (with respect to the keybinding). I would like to create a map or a menu for pomodoro timer.
 ** Applications
 #+begin_src lisp
-  ;; a todo
+  ;; audio
   (define-key *root-map* (kbd "a") "exec alacritty -e alsamixer")
-  ;; b todo
-  (define-key *root-map* (kbd "b") "exec firefox")
-  ;; Terminal
+  ;; browser
+  (define-key *root-map* (kbd "b") "browser")
+  ;; terminal
   (define-key *root-map* (kbd "c") "exec alacritty")
-  ;; d todo 
-  (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack'")
-  ;; Emacs
-  (define-key *root-map* (kbd "e") "exec emacsclient -c")
-  ;; f todo
+  ;; launcher
+  (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack' -nb '#0d0e1c' -nf '#ffffff' -sb '#4a4f69'")
+  ;; text editor
+  (define-key *root-map* (kbd "e") "editor")
+  ;; file manager (graphical)
   (define-key *root-map* (kbd "f") "exec pcmanfm")
-  ;; F todo
+  ;; file manager
   (define-key *root-map* (kbd "F") "exec alacritty -e lf")
   ;; g *GROUP-MAP* don't touch
   ;; h *HELP-MAP*  don't touch
@@ -253,10 +363,11 @@ Listed alphabetically (with respect to the keybinding).
   ;; l fix?
   ;; m lastmsg don't touch
   ;; n pull-hidden-next don't touch
+  (define-key *root-map* (kbd "n") "exec alacritty -e newsboat")
   ;; o fnext don't touch
   ;; p pull-hidden-previous don't touch
+  (define-key *root-map* (kbd "p") "exec sioyek")
   ;; P
-  (define-key *root-map* (kbd "P") "exec sioyek")
   ;; q quit-confirm don't touch
   ;; r iresize don't touch
   ;; R don't touch
@@ -339,65 +450,95 @@ Keybindings for managing system.
   (define-key *top-map* (kbd "XF86AudioMute") "volume-toggle-mute")
 #+end_src
 
-* MODELINE
+* TODO MODELINE
+Muovere in SETTINGS mantenendo l'albero.
 #+begin_src lisp
-;; Ordine di comparsa
-(setf stumpwm:*screen-mode-line-format*
-      (list "^7[^B^4%n^7^b]"
-	    " %v"
-	    "^>"                        ; Push right
-	    ;;	    " | %I"
-	    " | NET: %l"
-	    " | %M"
-	    " | %E"
-	    " | BAT: %B"
-	    " | CLK: %d")
-      *mode-line-pad-y* 3
-      *mode-line-pad-x* 15)
+  ;; Ordine di comparsa
+  (setf *mode-line-background-color* *mode-line-bg-color*
+        *mode-line-foreground-color* *mode-line-fg-color*
+        *mode-line-border-color* *mode-line-bg-color*
+        *mode-line-timeout* 5
+        *mode-line-border-width* 3
+        *mode-line-pad-x* 3
+        *mode-line-pad-y* 3
+        *screen-mode-line-format* (list "[" '(:eval (RUN-SHELL-COMMAND "date '+%F %H:%M'|tr -d [:cntrl:]" T)) "] [%n]  %w ^>""[%B] [luca@%h] %T"))
+
+  ;; (setf stumpwm:*screen-mode-line-format*
+  ;;       (list "^7[^B^4%n^7^b]"
+  ;; 	    " %v"
+  ;; 	    "^>"                        ; Push right
+  ;; 	    ;;	    " | %I"
+  ;; 	    " | NET: %l"
+  ;; 	    " | %M"
+  ;; 	    " | %E"
+  ;; 	    " | BAT: %B"
+  ;; 	    " | CLK: %d")
+  ;;       *mode-line-pad-y* 3
+  ;;       *mode-line-pad-x* 15)
 #+end_src
 
-* SETTINGS
+* TODO SESSION
+Muovere in SETTINGS mantenendo l'albero.
+#+begin_src lisp
+  ;; set DESKTOP_SESSION variable
+  (setf (getenv "DESKTOP_SESSION") "stumpwm")
+#+end_src
+
+* TODO SETTINGS
+Multiple definitions, fix.
 #+begin_src lisp
   (set-prefix-key (kbd "C-t"))
 
-  ;;; Font
-  ;;; Basic Settings
-  (setf *window-format* "%m%s%50t")
-  (setf *mode-line-background-color* (car *colors*)
-        ,*mode-line-foreground-color* (car (last *colors*))
-        ,*mode-line-timeout* 1)
+   ;;; Font
+   ;;; Basic Settings
+  (setf *window-format* "%m%s%20t")
+  ;; (setf *mode-line-background-color* (car *colors*)
+  ;;       *mode-line-foreground-color* (car (last *colors*))
+  ;;       *mode-line-timeout* 1)
 
-  (setf *message-window-gravity* :center
-        ,*window-border-style* :thin
-        ,*message-window-padding* 3
-        ,*maxsize-border-width* 2
-        ,*normal-border-width* 2
-        ,*transient-border-width* 2
-        stumpwm::*float-window-border* 1
-        stumpwm::*float-window-title-height* 1)
+  (setf 
+   ,*message-window-gravity* :center
+   ,*window-border-style* :thin
+   ,*message-window-padding* 3
+   ,*maxsize-border-width* 2
+   ,*normal-border-width* 2
+   ,*transient-border-width* 2
+   stumpwm::*float-window-border* 1
+   stumpwm::*float-window-title-height* 1)
 #+end_src
 
-* THEME
-** Colors
+* TODO THEME
+Muovere in SETTINGS mantenendo l'albero, rinominare in Appeareance.
+** Borders
 #+begin_src lisp
-  ;;; Theme
-  (setf *colors*
-        '("#000000"   ;black
-          "#BF6262"   ;red
-          "#a1bf78"   ;green
-          "#dbb774"   ;yellow
-          "#7D8FA3"   ;blue
-          "#ff99ff"   ;magenta
-          "#53cdbd"   ;cyan
-          "#ffffff")) ;white
+;; border width
+(setf *maxsize-border-width* 3)
+(setf *transient-border-width* 3)
+(setf *normal-border-width* 3)
 
-  (update-color-map (current-screen))
+;; border style
+(setf *window-border-style* :tight)
+;; (set-focus-color "#b00045")
+(set-focus-color *msg-border-color*)
+;; (set-win-bg-color "#b00045")
+(set-win-bg-color *msg-border-color*)
+;; (set-unfocus-color "#333333")
+(set-unfocus-color *msg-bg-color*)
+;; (set-float-focus-color "#b00045")
+(set-float-focus-color *msg-border-color*)
+;; (set-float-unfocus-color "#333333")
+(set-float-unfocus-color *msg-bg-color*)
+#+end_src
+** Message/input box
+#+begin_src lisp
+  ;; message/input bar colors
+  (set-bg-color *msg-bg-color*)
+  (set-fg-color *msg-fg-color*)
+  (set-border-color *msg-border-color*)
+#+end_src
 
-  ;; Mostra la barra
-  (mode-line)
-  #+end_src
-
-* WINDOWS
+* TODO WINDOWS
+Muovere in SETTINGS mantenendo l'albero.
 #+begin_src lisp
   (setf *input-window-gravity* :center
       ;; TODO determin why this appears above
@@ -405,3 +546,20 @@ Keybindings for managing system.
   ;; Clear rules
   (clear-window-placement-rules)
 #+end_src
+* TODO WINDOW PLACEMENTS
+Muovere in SETTINGS mantenendo l'albero.
+#+begin_src lisp
+  ;; Work
+  (define-frame-preference "dev"
+    ;; frame raise lock (lock AND raise == jumpto)
+    (0 t t :class "Emacs")
+    (1 t t :class "Alacritty"))
+  ;; Read
+  (define-frame-preference "read"
+    (0 t t :class "sioyek"))
+  ;; Web
+  (define-frame-preference "web"
+    (0 t t :class "firefox"))
+#+end_src
+
+

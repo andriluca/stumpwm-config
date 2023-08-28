@@ -10,6 +10,9 @@
 - [[#initializations][INITIALIZATIONS]]
   - [[#groups][Groups]]
   - [[#helpers][Helpers]]
+  - [[#variables][Variables]]
+  - [[#modularity][Modularity]]
+  - [[#files][Files]]
   - [[#modules][Modules]]
   - [[#runners][Runners]]
   - [[#themes][Themes]]
@@ -50,6 +53,27 @@ Inserire icone FontAwesome.
   (gnewbg "dev")
   (gnewbg "read")
   (gnewbg "relax")
+** Modularity
+#+begin_src lisp
+  (defun al/load (filename)
+    "Load a file FILENAME (without extension) from `al/init-directory'."
+    (let ((file (merge-pathnames (concat filename ".lisp")
+                                 al/init-directory)))
+      (if (probe-file file)
+          (load file)
+          (format *error-output* "File '~a' doesn't exist." file))))
+
+  (defun al/load-module (name)
+    "Load contributed stumpwm module NAME.
+  Return nil, if the module does not exist.
+  This function is similar to `load-module' command, except it returns nil
+  instead of any error."
+    (let ((module (find-module (string-downcase name))))
+      (and module
+           (progn (asdf:operate 'asdf:load-op module)
+                  t))))
+#+end_src
+
 #+end_src
 
 ** Helpers

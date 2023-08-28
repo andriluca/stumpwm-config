@@ -1,0 +1,4 @@
+#+title: Configurazione personale di StumpWM
+#+author: Luca Andriotto
+
+Questa repository raccoglie tutti i file di configurazione di =StumpWM=, il window manager personalizzabile tramite il linguaggio =Common Lisp=.

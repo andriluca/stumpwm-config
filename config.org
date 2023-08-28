@@ -24,7 +24,9 @@
   - [[#gaps][Gaps]]
   - [[#messageinput-box][Message/input box]]
   - [[#modeline][Modeline]]
+  - [[#messageinput-box][Message/Input box]]
   - [[#startup-message][Startup message]]
+  - [[#which-key][Which-key]]
 - [[#keybindings][KEYBINDINGS]]
   - [[#applications][Applications]]
   - [[#backlight][Backlight]]
@@ -35,8 +37,7 @@
   - [[#prefix-key][Prefix key]]
   - [[#completion][Completion]]
   - [[#input-devices][Input Devices]]
-  - [[#message-box][Message box]]
-  - [[#modeline-1][Modeline]]
+  - [[#messageinput-box-1][Message/Input box]]
   - [[#session][Session]]
   - [[#windows][Windows]]
 
@@ -86,12 +87,14 @@ Inserire icone FontAwesome.
       (when cmd
         (eval-command cmd t))))
 #+end_src
+
 *** Keybindings
 #+begin_src lisp
   (defun tr-define-key (key command)
     (define-key *top-map* (kbd (concat "s-" key )) command)
     (define-key *root-map* (kbd key) command))
 #+end_src
+
 *** Search
 #+begin_src lisp
 ;; Web jump (works for DuckDuckGo and Imdb)
@@ -318,7 +321,8 @@ Allowing gaps for better aesthetics.
 
   (swm-gaps:toggle-gaps)
 #+end_src
-** Message/input box
+
+** Message/Input box
 #+begin_src lisp
   ;; message/input bar colors
   (set-bg-color     *msg-bg-color*)
@@ -326,18 +330,18 @@ Allowing gaps for better aesthetics.
   (set-border-color *msg-border-color*)
 #+end_src
 
-** Modeline
-Spostare il controllo della modeline.
-#+begin_src lisp
-  (update-color-map (current-screen))
-#+end_src
-
 ** Startup message
 #+begin_src lisp
   ;; startup message
-  (setf *startup-message* "^5    Stump Window Manager ^8has initialized!
-  Press ^5Ctrl+t ? ^8for Help. ^5Never Stop Hacking!^n
-            Powered with ^81 Common Lisp ")
+  (setf *startup-message* "^6    Stump Window Manager ^8has initialized!
+    Press ^6Ctrl+t ? ^8for Help. ^6Never Stop Hacking!^n
+              Powered with ^87 Common Lisp ")
+#+end_src
+
+** Which-key
+#+begin_src lisp
+  ;; (setf *key-seq-color* "^3")
+  ;; (setf *which-key-format* "~3a -> ~a")
 #+end_src
 
 * KEYBINDINGS
@@ -346,12 +350,15 @@ Listed alphabetically (with respect to the keybinding). I would like to create a
 #+begin_src lisp
   ;; audio
   (define-key *root-map* (kbd "a") "exec alacritty -e alsamixer")
+  ;; alert me
+  (define-key *top-map* (kbd "s-a") "alert-me-at")
   ;; browser
   (define-key *root-map* (kbd "b") "browser")
   ;; terminal
   (define-key *root-map* (kbd "c") "exec alacritty")
   ;; launcher
-  (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack' -nb '#0d0e1c' -nf '#ffffff' -sb '#4a4f69'")
+  ;; (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack' -nb '#0d0e1c' -nf '#ffffff' -sb '#4a4f69'")
+  (define-key *root-map* (kbd "d") "exec stumpwm-dmenu_run")
   ;; text editor
   (define-key *root-map* (kbd "e") "editor")
   ;; file manager (graphical)

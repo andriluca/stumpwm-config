@@ -372,6 +372,7 @@ Changing themes for the various graphical components. Fare il merge con theme fu
   ;; (set-float-focus-color "#b00045")
   ;; (set-float-unfocus-color "#333333")
 #+end_src
+
 ** Desktop background
 Simply putting a color for a background. It is possible to tweak it differently.
 #+begin_src lisp
@@ -390,8 +391,8 @@ Muovi in Themes, mantieni l'entry creando il collegamento. Usare qualche simbolo
              (make-instance 'xft:font
                             :family "FontAwesome"
                             :subfamily "Regular"
-                            :size 12)))
-  (xft:cache-fonts)  
+                            :size 14)))
+  (xft:cache-fonts)
 #+end_src
 
 ** Gaps
@@ -663,6 +664,73 @@ Sistemare pomodoro timer.
         ,*mode-line-pad-y*            3)                   ; text padding in y
 
   ;; Ordine di comparsa
+  (setf *screen-mode-line-format*
+        (list "^6[%g]^n "       ; groups
+              ;; "^5%t^n "         ; notifications
+              "%W"              ; windows
+              "^>"              ; right align
+              "%S"              ; slynk status
+              "%s"              ; syncthing status
+              "%B"              ; battery percentage
+              "%T"
+              "%d"))            ; time/date
+
+  ;; turn on the mode line
+  (if (not (head-mode-line (current-head)))
+      (toggle-mode-line (current-screen) (current-head)))
+#+end_src
+*** Formatters
+(#\A EMPTY)
+(#\a EMPTY)
+(#\B #<FUNCTION BATTERY-PERCENTAGE>)
+(#\C EMPTY)
+(#\c EMPTY)
+(#\D EMPTY)
+(#\d FMT-MODELINE-TIME)
+(#\E STUMPWM-WEATHER::MODE-LINE-STR)
+(#\e EMPTY)
+(#\F EMPTY)
+(#\f EMPTY)
+(#\G EMPTY)
+(#\g FMT-GROUP-LIST)
+(#\H EMPTY)
+(#\h FMT-HEAD)
+(#\I #<FUNCTION WIFI::FMT-WIFI>)
+(#\i EMPTY)
+(#\J EMPTY)
+(#\j EMPTY)
+(#\K EMPTY)
+(#\k EMPTY)
+(#\L #<FUNCTION KBD-LAYOUTS::CURRENT-KEYBOARD-LAYOUT>)
+(#\l EMPTY)
+(#\M FMT-ALL-MINOR-MODES)
+(#\m FMT-MINOR-MODES)
+(#\N NOTIFICATIONS::NOTIFICATIONS-AS-STRING)
+(#\n FMT-GROUP)
+(#\O EMPTY)
+(#\o EMPTY)
+(#\P EMPTY)
+(#\p EMPTY)
+(#\Q EMPTY)
+(#\q EMPTY)
+(#\R EMPTY)
+(#\r EMPTY)
+(#\S #<FUNCTION ML-FMT-SLYNK-STATUS>)
+(#\s #<FUNCTION ML-FMT-SYNCTHING-STATUS>)
+(#\T ?)
+(#\t TOMATO:MODELINE)
+(#\U EMPTY)
+(#\u FMT-URGENT-WINDOW-LIST)
+(#\V EMPTY)
+(#\v FMT-HEAD-WINDOW-LIST-HIDDEN-WINDOWS)
+(#\W FMT-HEAD-WINDOW-LIST)
+(#\w FMT-WINDOW-LIST)
+(#\X EMPTY)
+(#\x EMPTY)
+(#\Y EMPTY)
+(#\y EMPTY)
+(#\Z EMPTY)
+(#\z EMPTY)
 
 ** Session
 #+begin_src lisp

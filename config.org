@@ -30,6 +30,9 @@
 - [[#keybindings][KEYBINDINGS]]
   - [[#applications][Applications]]
   - [[#backlight][Backlight]]
+  - [[#buffers][Buffers]]
+  - [[#layout][Layout]]
+  - [[#movement][Movement]]
   - [[#search][Search]]
   - [[#system][System]]
   - [[#volume][Volume]]
@@ -210,6 +213,16 @@ Displaying current weather information
         stumpwm-weather:*format-str*            "Name: %n | Hum: %H% | Weath: %d | Tmin %T | Tmax %h"
         stumpwm-weather:*mode-line-formatter*   #\E)
   (stumpwm-weather:on)
+*** Splitting
+Focus the created frame.
+#+begin_src lisp
+  (defcommand al/hsplit () ()
+    (hsplit)
+    (move-focus :right))
+
+  (defcommand al/vsplit () ()
+    (vsplit)
+    (move-focus :down))
 #+end_src
 
 ** Runners
@@ -400,6 +413,68 @@ Controlling brightness. Spostare in keybindings
   (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
 #+end_src
 
+** Buffers
+Handling hidden buffers behind frames.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-N") "pull-hidden-next")
+  (define-key *top-map* (kbd "s-P") "pull-hidden-previous")
+  (define-key *top-map* (kbd "s-S-SPC") "pull-hidden-next")
+#+end_src
+
+** Layout
+#+begin_src lisp
+  ;; Splitting
+  (define-key *top-map* (kbd "s-s") "al/vsplit")
+  (define-key *top-map* (kbd "s-h") "al/hsplit")
+
+  (define-key *top-map* (kbd "s-r") "remove")
+  (define-key *top-map* (kbd "s-R") "iresize")
+
+  (define-key *top-map* (kbd "s-q") "only")
+
+  ;; Resizing
+  (define-key *top-map* (kbd "s-z") "iresize")
+
+  ;; keyboard layout
+  (define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
+#+end_src
+
+** Movement
+*** Groups
+Handling jumping from one group to another with or without windows.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-`") "grouplist")
+
+  (define-key *top-map* (kbd "s-C-n") "gselect 1")
+  (define-key *top-map* (kbd "s-C-e") "gselect 2")
+  (define-key *top-map* (kbd "s-C-o") "gselect 3")
+  (define-key *top-map* (kbd "s-C-i") "gselect 4")
+
+  (define-key *top-map* (kbd "s-C-N") "gmove-and-follow 1")
+  (define-key *top-map* (kbd "s-C-E") "gmove-and-follow 2")
+  (define-key *top-map* (kbd "s-C-O") "gmove-and-follow 3")
+  (define-key *top-map* (kbd "s-C-I") "gmove-and-follow 4")
+#+end_src
+
+*** Windows
+Shifting focus on windows being on different frames and moving them
+around.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-x") '*al/exchange-window-map*)
+
+  (define-key *top-map* (kbd "s-n") "move-focus left")
+  (define-key *top-map* (kbd "s-e") "move-focus down")
+  (define-key *top-map* (kbd "s-o") "move-focus up")
+  (define-key *top-map* (kbd "s-i") "move-focus right")
+
+  (define-key *top-map* (kbd "s-N") "move-window left")
+  (define-key *top-map* (kbd "s-E") "move-window down")
+  (define-key *top-map* (kbd "s-O") "move-window up")
+  (define-key *top-map* (kbd "s-I") "move-window right")
+#+end_src
 ** Search
 Managing the interfaces to different sources for information research.
 #+begin_src lisp

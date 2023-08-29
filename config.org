@@ -46,18 +46,55 @@
   - [[#windows][Windows]]
 
 * TODO INITIALIZATIONS
-Metterei i define dei temi, di tutti i parametri, organizzati per
-risorsa, le funzioni helper e i runners.
 ** Groups
-Inserire icone FontAwesome.
 #+begin_src lisp
   (in-package :stumpwm)
 
   ;; creating groups
-  (setf (group-name (first (screen-groups (current-screen)))) "web")
-  (gnewbg "dev")
-  (gnewbg "read")
-  (gnewbg "relax")
+  (setf *group-web*   "^f1    ^f0")
+  (setf *group-dev*   "^f1    ^f0")
+  (setf *group-read*  "^f1    ^f0")
+  (setf *group-relax* "^f1    ^f0")
+
+  ;; web
+  (setf (group-name (first (screen-groups (current-screen)))) *group-web*)
+  ;; dev
+  (gnewbg *group-dev*)
+  ;; read
+  (gnewbg *group-read*)
+  ;; relax
+  (gnewbg *group-relax*)
+
+  (setf *group-format* "%t")
+#+end_src
+
+** Variables
+*** Directories
+#+begin_src lisp
+  (defvar al/init-directory
+    (directory-namestring
+     (truename (merge-pathnames
+                "stumpwm" (uiop:xdg-config-pathname))))
+    "A directory with initially loaded files.")
+
+  (defvar al/modules-directory
+    (directory-namestring
+     (truename (merge-pathnames
+                ".stumpwm.d/modules" (user-homedir-pathname))))
+    "A directory with initially loaded files.")
+
+  (defvar al/data-directory
+    (directory-namestring
+     (truename (merge-pathnames
+                (uiop:xdg-data-pathname) "stumpwm")))
+    "A directory with data files.")
+#+end_src
+
+*** Logs
+#+begin_src lisp
+  (redirect-all-output (merge-pathnames "log" al/data-directory))
+#+end_src
+
 ** Modularity
 #+begin_src lisp
   (defun al/load (filename)
@@ -125,112 +162,6 @@ Managed by =*time-modeline-string*=
     (run-shell-command (concatenate 'string ,prefix search))))
 #+end_src
 
-** TODO Modules
-The modules that are required for the UI to show important pieces of
-information and operate on input/output.  Using a [[https://github.com/jamesmccabe/clx-truetype][fork]] from
-clx-truetype.
-*** Contrib modules
-Modules written by the community that I use (or I am interested in using).
-#+begin_src lisp
-  ;; App menu
-  (load-module "app-menu")
-  ;; Manage backlight
-  (load-module "stump-backlight")
-  ;; Battery level
-  (load-module "battery-portable")
-  ;; "Fuzzy" completion
-  (ql:quickload :stumpwm-prescient)
-  ;; Font rendering
-  (ql:quickload :clx-truetype)
-  (load-module "ttf-fonts")
-  ;;; Caching the fonts
-  (setq clx-truetype::*font-dirs*
-        (append (list (namestring (merge-pathnames ".local/share/fonts" (user-homedir-pathname))))
-                clx-truetype::*font-dirs*))
-  ;; (Multiple) keyboard layouts.
-  (load-module "kbd-layouts")
-  ;; Gaps for aesthetics
-  (load-module "swm-gaps")
-  ;; Golden ratio (automatically resize windows)
-  (load-module "swm-golden-ratio")
-  ;; Hostname
-  (load-module "hostname")
-  ;; Memory usage
-  (load-module "mem")
-  ;; Network traffic
-  (load-module "net")
-  ;; Pomodoro timer to get productive
-  (load-module "notifications")
-  (load-module "swm-pomodoro")
-  ;; Manage end of session
-  ;; (add-to-load-path #p"path-to-contrib/util/end-session")
-  (load-module "end-session")
-  ;; Slynk server
-  (ql:quickload :slynk)
-  ;; Spatial groups
-  ;; (ql:quickload "spatial-groups")
-  ;; (load-module "spatial-groups")
-  ;; (spatial-groups:install-default-keybinds) ; optional
-  ;; Tray
-  (load-module "stumptray")
-  ;; Weather
-  (ql:quickload :stumpwm-weather)
-  ;; Winner-mode
-  ;; WiFi
-  (load-module "wifi")
-  ;; Volume level
-  (load-module "stump-volume-control")
-#+end_src
-
-*** TODO Modules configuration
-Distinguere gli elementi *theme-related* da quelli *config-related* e
-mantenere in questa sezione solamente i secondi.
-**** TODO App menu
-Potrebbe essere un buono spunto per realizzare un launcher di applicazioni.
-**** Completion
-#+begin_src lisp
-  (setf *input-refine-candidates-fn* 'stumpwm-prescient:refine-input)
-#+end_src
-**** Fonts
-See APPEAREANCE section.
-**** Gaps
-See APPEAREANCE section.
-**** TODO Golden ratio
-Crea keybinding per toggle.
-#+begin_src lisp
-  (swm-golden-ratio:toggle-golden-ratio)
-#+end_src
-**** TODO Pomodoro timer
-Pomodoro timer to get productive. Menu e keybinding per gestirli.
-#+begin_src lisp
-  (setf swm-pomodoro:*bell-sound-file* "~/Music/bell.wav")
-#+end_src
-**** Session manager
-#+begin_src lisp
-  ;; Manage end of session
-  (setf end-session:*end-session-command* "loginctl")
-#+end_src
-**** TODO Slynk
-Creating a slynk server to connect to when performing tweaking. Cerca
-le funzioni del tizio di youtube.
-#+begin_src lisp
-  (slynk:create-server
-   :dont-close t)
-#+end_src
-**** TODO Tray
-Come funziona?
-**** TODO Weather
-Displaying current weather information
-#+begin_src lisp
-  (setf stumpwm-weather:*open-weather-map-api-key*
-        "52a1bf7387593e8ab895b2104f9c0de8"
-      
-        stumpwm-weather:*units*                 "metric"
-        stumpwm-weather:*time-format-str*       "%H:%M:%S"
-        stumpwm-weather:*location*              "20129,it"
-        stumpwm-weather:*format-str*            "Name: %n | Hum: %H% | Weath: %d | Tmin %T | Tmax %h"
-        stumpwm-weather:*mode-line-formatter*   #\E)
-  (stumpwm-weather:on)
 *** Splitting
 Focus the created frame.
 #+begin_src lisp
@@ -481,7 +412,7 @@ Listed alphabetically (with respect to the keybinding). I would like to create a
 #+end_src
 
 ** Backlight
-Controlling brightness. Spostare in keybindings
+Controlling brightness.
 #+begin_src lisp
   (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
   (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
@@ -573,25 +504,30 @@ Keybindings for managing system.
 #+begin_src lisp
   ;; C-a todo
   ;; C-b banish don't touch
+  (define-key *top-map* (kbd "s-b") "mode-line")
   ;; C-c todo
   ;; C-d todo
   ;; C-e todo
+  ;;(define-key *top-map* (kbd "s-e") "gnext-with-window")
   ;; Fullscreen
   (define-key *root-map* (kbd "C-f") "fullscreen")
   (define-key *top-map* (kbd "s-f") "fullscreen")
   ;; C-g don't touch
-  (define-key *top-map* (kbd "s-g") "toggle-golden-ratio")
+  (define-key *top-map* (kbd "s-g") "al/toggle-golden-ratio")
   ;; C-h don't touch
   ;; C-i todo
+  ;;(define-key *top-map* (kbd "s-i") "gnext")
   ;; C-j todo
   ;; C-k don't touch (fix?)
   ;; Lock screen
   (define-key *root-map* (kbd "C-l") "exec slock")
   ;; C-m fix, todo
   ;; C-n don't touch
+  ;;(define-key *top-map* (kbd "s-n") "gprev")
   ;; Cycling groups
   (define-key *root-map* (kbd "C-o") "gnext")
   (define-key *root-map* (kbd "C-O") "gnext-with-window")
+  ;;(define-key *top-map* (kbd "s-o") "gprev-with-window")
   ;; C-p don't touch
   ;; C-q todo
   (define-key *root-map* (kbd "C-q") "logout")
@@ -738,6 +674,11 @@ Sistemare pomodoro timer.
 #+begin_src lisp
   ;; set DESKTOP_SESSION variable
   (setf (getenv "DESKTOP_SESSION") "stumpwm")
+#+end_src
+
+** Startup
+#+begin_src emacs-lisp
+  (start-syncthing)
 #+end_src
 
 ** Windows

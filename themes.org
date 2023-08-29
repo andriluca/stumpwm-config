@@ -1,0 +1,112 @@
+#+TITLE: StumpWM Themes
+#+AUTHOR: Luca Andriotto
+#+PROPERTY: header-args :tangle themes.lisp
+#+auto_tangle: t
+#+DESCRIPTION: Qualche tema per rendere più allettante l'esperienza utente.
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* TODO Current theme
+Aggiungere anche i colori di modus-theme-tinted.  L'ordine dei colori
+è indicato dalla documentazione di stumpwm e segue uno standard.
+#+begin_src lisp
+  (in-package :stumpwm)
+
+  ;; Dracula theme
+  (defvar dracula-color0 "#282a36")
+  (defvar dracula-color1 "#ff5555")
+  (defvar dracula-color2 "#50fa7b")
+  (defvar dracula-color3 "#ffb86c")
+  (defvar dracula-color4 "#6272a4")
+  (defvar dracula-color5 "#ff79c6")
+  (defvar dracula-color6 "#8be9fd")
+  (defvar dracula-color7 "#bd93f9")
+  (defvar dracula-color8 "#f8f8f2")
+
+  ;; Nord theme
+  (defvar nord-color0  "#2e3440")
+  (defvar nord-color1  "#3b4252")
+  (defvar nord-color2  "#434c5e")
+  (defvar nord-color3  "#4c566a")
+  (defvar nord-color4  "#d8dee9")
+  (defvar nord-color5  "#e5e9f0")
+  (defvar nord-color6  "#eceff4")
+  (defvar nord-color7  "#8fbcbb")
+  (defvar nord-color8  "#88c0d0")
+  (defvar nord-color9  "#81a1c1")
+  (defvar nord-color10 "#5e81ac")
+  (defvar nord-color11 "#bf616a")
+  (defvar nord-color12 "#d08770")
+  (defvar nord-color13 "#ebcb8b")
+  (defvar nord-color14 "#a3be8c")
+  (defvar nord-color15 "#b48ead")
+
+  (defvar my-nord-theme
+    `(,nord-color0   ; ^0 ; Black
+      ,nord-color11  ; ^1 ; Red
+      ,nord-color14  ; ^2 ; Green
+      ,nord-color12  ; ^3 ; Orange
+      ,nord-color10  ; ^4 ; Blue
+      ,nord-color15  ; ^5 ; Magenta
+      ,nord-color7   ; ^6 ; Cyan
+      ,nord-color8   ; ^7 ; Cyan2
+      ,nord-color6)) ; ^8 ; White
+
+  (defvar my-dracula-theme
+    `(,dracula-color0
+      ,dracula-color1
+      ,dracula-color2
+      ,dracula-color3
+      ,dracula-color4
+      ,dracula-color5
+      ,dracula-color6
+      ,dracula-color7
+      ,dracula-color8))
+
+  (setq *colors* my-dracula-theme)
+
+#+end_src
+
+* Other themes
+#+begin_src lisp :tangle no
+
+  (setf *colors*
+        '(
+          "#282a36"        ; ^0 ; Black
+          "#ff5555"        ; ^1 ; Red
+          "#50fa7b"        ; ^2 ; Green
+          "#ffb86c"        ; ^3 ; Yellow / Help map keys
+          "#6272a4"        ; ^4 ; Blue
+          "#ff79c6"        ; ^5 ; Magenta
+          "#8be9fd"        ; ^6 ; Cyan
+          "#bd93f9"        ; ^7 ; Purple
+          "#f8f8f2"        ; ^8 ; White
+          ))
+
+  ;; James McCabe
+  ;;   (setf *colors*
+  ;;         '(
+  ;;           "#131220"        ; ^1 ; Dark Blue
+  ;;           "#f72f33"        ; ^6 ; Red
+  ;;           "#689d6a"        ; ^4 ; Light Green
+  ;;           "#fabd2f"        ; ^3 ; Yellow / Help map keys
+  ;;           "#62bfef"        ; ^4 ; Light Blue
+  ;;           "#ff99ff"        ; ^2 ; Magenta
+  ;;           ;; "#a644bf"     ;    ; Old magenta
+  ;;           "#56b6c2"
+  ;;           "#cc4a0e"        ; ^7 ; Brown
+  ;;           "#ffffff"        ; ^0 ; White
+  ;;           ))      ; ^8 ; Cyan 
+
+  ;; ;;; Theme
+  ;; ;;; Gavin Freeborn
+  ;; (setf *colors*
+  ;;       '("#000000"   ;black
+  ;;         "#BF6262"   ;red
+  ;;         "#a1bf78"   ;green
+  ;;         "#dbb774"   ;yellow
+  ;;         "#7D8FA3"   ;blue
+  ;;         "#ff99ff"   ;magenta
+  ;;         "#53cdbd"   ;cyan
+  ;;         "#ffffff")) ;white
+#+end_src

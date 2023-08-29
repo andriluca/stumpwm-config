@@ -1,0 +1,197 @@
+#+TITLE: Modules
+#+AUTHOR: Luca Andriotto
+#+PROPERTY: header-args :tangle modules.lisp
+#+auto_tangle: t
+#+DESCRIPTION: Moduli di StumpWM che utilizzo
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+The modules that are required for the UI to show important pieces of
+information and operate on input/output.  Using a [[https://github.com/jamesmccabe/clx-truetype][fork]] from
+clx-truetype.
+
+* Contrib modules
+Modules written by the community that I use (or I am interested in using).
+#+begin_src lisp
+  (in-package :stumpwm)
+
+  ;; Modules directory
+  (set-module-dir al/modules-directory)
+
+  ;; Alert me
+  (al/load-module "alert-me")
+  ;; App menu
+  (al/load-module "app-menu")
+  ;; Audio
+  (al/load-module "amixer")
+  ;; Manage backlight
+  (al/load-module "stump-backlight")
+  ;; Battery level
+  ;; (al/load-module "battery-portable")
+  ;; "Fuzzy" completion
+  (ql:quickload :stumpwm-prescient)
+  ;; Font rendering
+  (ql:quickload :clx-truetype)
+  (al/load-module "ttf-fonts")
+    ;;; Caching the fonts
+  (setq clx-truetype::*font-dirs*
+        (append (list (namestring (merge-pathnames ".local/share/fonts" (user-homedir-pathname))))
+                clx-truetype::*font-dirs*))
+  ;; (Multiple) keyboard layouts.
+  (al/load-module "kbd-layouts")
+  ;; Gaps for aesthetics
+  (al/load-module "swm-gaps")
+  ;; Golden ratio (automatically resize windows)
+  (al/load-module "swm-golden-ratio")
+  ;; Hostname
+  ;; (al/load-module "hostname")
+  ;; Memory usage
+  ;; (al/load-module "mem")
+  ;; Network traffic
+  ;; (al/load-module "net")
+  ;; Pomodoro timer to get productive
+  (al/load-module "notifications")
+  (al/load-module "swm-pomodoro")
+  (add-to-load-path "~/.stumpwm.d/modules/tomato")
+  (al/load-module "tomato")
+  ;; Manage end of session
+  ;; (add-to-load-path #p"path-to-contrib/util/end-session")
+  (al/load-module "end-session")
+  ;; Slynk server
+  (ql:quickload :slynk)
+  ;; Spatial groups
+  ;; (ql:quickload "spatial-groups")
+  ;; (al/load-module "spatial-groups")
+  ;; (spatial-groups:install-default-keybinds) ; optional
+  ;; Tray
+  (al/load-module "stumptray")
+  ;; Weather
+  (ql:quickload :stumpwm-weather)
+  ;; Winner-mode
+  ;; WiFi
+  (al/load-module "wifi")
+  ;; Volume level
+  ;; (al/load-module "stump-volume-control")
+#+end_src
+
+* TODO Modules configuration
+** TODO App menu
+Potrebbe essere un buono spunto per realizzare un launcher di applicazioni.
+#+begin_src lisp
+  (setq app-menu:*app-menu*
+        '(;; Coding
+          ("CODE"
+           ("Emacs" editor)
+           ("Terminal" "alacritty"))
+          ;; Internet apps
+          ("INTERNET"
+           ("Brave"   brave)
+           ("Firefox" browser)
+           ("Nyxt"    nyxt))
+          ;; Writing apps
+          ("WORK"
+           ("LibreOffice"  libreoffice)
+           ("MATLAB"       matlab))))
+#+end_src
+
+** Completion
+#+begin_src lisp
+  (setf *input-refine-candidates-fn* 'stumpwm-prescient:refine-input)
+#+end_src
+
+** Fonts
+See APPEAREANCE section.
+** Gaps
+See APPEAREANCE section.
+** DONE Golden ratio
+Crea keybinding per toggle.  Lascio il golden-ratio disabilitato di default.
+#+begin_src lisp
+  ;; (swm-golden-ratio:toggle-golden-ratio)
+#+end_src
+
+** TODO Pomodoro timer
+Pomodoro timer to get productive. Menu e keybinding per gestirli.
+#+begin_src lisp
+  (setf swm-pomodoro:*bell-sound-file* "~/Music/bell.wav")
+#+end_src
+
+** Session manager
+#+begin_src lisp
+  ;; Manage end of session
+  (setf end-session:*end-session-command* "loginctl")
+#+end_src
+
+** DONE Slynk
+Creating a slynk server to connect to when performing
+tweaking. Command *toggle-slynk*, *start-slynk* and *stop-slynk* are
+available. Slynk server is off by default. (see modules helpers).
+
+** TODO Tray
+Come funziona?
+** TODO Weather
+Displaying current weather information
+#+begin_src lisp
+  (setf stumpwm-weather:*open-weather-map-api-key*
+          "52a1bf7387593e8ab895b2104f9c0de8"
+
+          stumpwm-weather:*units*                 "metric"
+  ;;        stumpwm-weather:*time-format-str*       "%H:%M:%S"
+          stumpwm-weather:*location*              "20129,it"
+          stumpwm-weather:*format-str*            "Name: %n | Hum: %H% | Weath: %d | Tmin %T | Tmax %h"
+          stumpwm-weather:*mode-line-formatter*   #\E)
+  (stumpwm-weather:on)
+#+end_src
+
+* Modules helpers
+** Golden ratio
+#+begin_src lisp
+  (defcommand al/toggle-golden-ratio () ()
+              ;; toggle golden ratio
+              (swm-golden-ratio:toggle-golden-ratio)
+              (message "^6Golden ratio^n has been toggled"))
+#+end_src
+
+** Slynk server
+Used to handle slynk directly.
+#+begin_src lisp
+  ;; Server port
+  (defparameter *port-number* 4004)
+  (defvar *slynk-server-p* nil
+    "keeps track of slynk server, off by default on startup")
+
+  (defcommand start-slynk () ()
+    "Start Slynk if it is not already running"
+    (if *slynk-server-p*
+        (message "Slynk server is already active on Port^5 ~a^n" *port-number*)
+        (progn
+          (slynk:create-server :port *port-number*
+                               :style slynk:*communication-style*
+                               :dont-close t)
+          (setf *slynk-server-p* t)
+          (message "Slynk server is now active on Port^6 ~a^n.
+    Use^6 M-x sly-connect^n in Emacs. 
+    Type^2 (in-package :stumpwm)^n in Sly REPL." *port-number*))))
+
+  (defcommand stop-slynk () ()
+    "Stop Slynk"
+    (slynk:stop-server *port-number*)
+    (setf *slynk-server-p* nil)
+    (message "Stopping Slynk Server! Closing Port^6 ~a^n." *port-number*))
+
+  (defcommand toggle-slynk () ()
+    (if *slynk-server-p*
+        (run-commands "stop-slynk")
+        (run-commands "start-slynk")))
+
+  ;; modeline status
+  (defun get-slynk-status ()
+    (if *slynk-server-p*
+        (setf *slynk-ml-status* (format nil "^6Slynk^n ^2^f1^f0^n ^6Port^n: ~a " *port-number*))
+        (setf *slynk-ml-status* "")))
+
+  (defun ml-fmt-slynk-status (ml)
+    (declare (ignore ml))
+    (get-slynk-status))
+
+  (add-screen-mode-line-formatter #\S #'ml-fmt-slynk-status)
+#+end_src

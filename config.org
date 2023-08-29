@@ -14,6 +14,7 @@
   - [[#system-helpers][System Helpers]]
   - [[#files][Files]]
   - [[#modules][Modules]]
+  - [[#keymaps][Keymaps]]
   - [[#runners][Runners]]
   - [[#themes][Themes]]
 - [[#appeareance][APPEAREANCE]]
@@ -366,11 +367,6 @@ Changing themes for the various graphical components. Fare il merge con theme fu
   (set-unfocus-color       *msg-bg-color*)
   (set-float-focus-color   *msg-border-color*)
   (set-float-unfocus-color *msg-bg-color*)
-  ;; (set-focus-color "#b00045")
-  ;; (set-win-bg-color "#b00045")
-  ;; (set-unfocus-color "#333333")
-  ;; (set-float-focus-color "#b00045")
-  ;; (set-float-unfocus-color "#333333")
 #+end_src
 
 ** Desktop background
@@ -452,22 +448,28 @@ Listed alphabetically (with respect to the keybinding). I would like to create a
   (define-key *root-map* (kbd "F") "exec alacritty -e lf")
   ;; g *GROUP-MAP* don't touch
   ;; h *HELP-MAP*  don't touch
-  ;; i todo
+  ;; i sioyek
+  (define-key *root-map* (kbd "i") "sioyek")
   ;; j todo
   ;; k DELETE-WINDOW don't touch
   ;; l fix?
+  (define-key *root-map* (kbd "l") "show-menu")
   ;; m lastmsg don't touch
   ;; n pull-hidden-next don't touch
-  (define-key *root-map* (kbd "n") "exec alacritty -e newsboat")
+  (define-key *root-map* (kbd "n") "newsboat")
   ;; o fnext don't touch
   ;; p pull-hidden-previous don't touch
-  (define-key *root-map* (kbd "p") "exec sioyek")
   ;; P
+  ;; s-p
+  (define-key *top-map* (kbd "s-p") '*al/pomodoro-bindings*)
   ;; q quit-confirm don't touch
   ;; r iresize don't touch
   ;; R don't touch
   ;; s vsplit
+  ;; s-s slynk
   ;; S hsplit
+  ;; s-S syncthing
+  (define-key *top-map* (kbd "s-S") "toggle-syncthing")
   ;; t don't touch
   ;; u todo
   ;; v todo
@@ -597,26 +599,26 @@ Keybindings for managing system.
   (define-key *root-map* (kbd "C-r") "restart-computer")
   ;; C-s
   (define-key *root-map* (kbd "C-s") "shutdown-computer")
-  ;; ssh
-  ;;  (define-key *root-map* (kbd "C-s") "colon1 exec alacritty -e ssh ")
-  ;; C-t
+  (define-key *top-map* (kbd "s-l") "toggle-slynk")
+  ;; C-t don't touch
   ;; C-u
   ;; C-v
   ;; C-w
   ;; C-x
   ;; C-y
   ;; C-z
+  ;; .
 #+end_src
 ** Volume
 #+begin_src lisp
-  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "volume-up")
-  (define-key *top-map* (kbd "XF86AudioLowerVolume") "volume-down")
-  (define-key *top-map* (kbd "XF86AudioMute") "volume-toggle-mute")
+  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "amixer-master-1+")
+  (define-key *top-map* (kbd "XF86AudioLowerVolume") "amixer-master-1-")
+  (define-key *top-map* (kbd "XF86AudioMute")        "amixer-master-toggle")
 #+end_src
 
 * SETTINGS
-Multiple definitions, fix.
 ** Prefix key
+This is the prefix key i normally use.
 #+begin_src lisp
   (set-prefix-key (kbd "C-t"))
 #+end_src

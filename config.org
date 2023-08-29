@@ -9,9 +9,9 @@
 * Table of Contents :toc:
 - [[#initializations][INITIALIZATIONS]]
   - [[#groups][Groups]]
-  - [[#helpers][Helpers]]
   - [[#variables][Variables]]
   - [[#modularity][Modularity]]
+  - [[#system-helpers][System Helpers]]
   - [[#files][Files]]
   - [[#modules][Modules]]
   - [[#runners][Runners]]
@@ -78,9 +78,26 @@ Inserire icone FontAwesome.
                   t))))
 #+end_src
 
+** System Helpers
+*** Battery
+#+begin_src lisp
+  (defparameter *battery-percent* "")
+
+  (defun get-battery-status ()
+    (let* ((batgetcap (run-shell-command "cat /sys/class/power_supply/BAT0/capacity | tr -d '\\r\\n'" t)))
+      (setf *battery-percent* (format nil "^6^f1^f0^n ~a% " batgetcap))))
+
+  (defun battery-percentage (ml)
+    (declare (ignore ml))
+    ,*battery-percent*)
+
+  (run-with-timer 0 10 #'get-battery-status)
+  (add-screen-mode-line-formatter #\B #'battery-percentage)
 #+end_src
 
-** Helpers
+*** Date
+Managed by =*time-modeline-string*=
+
 *** Colon
 #+begin_src lisp
   ;; prompt the user for an interactive command. The first arg is an
@@ -224,6 +241,60 @@ Focus the created frame.
     (vsplit)
     (move-focus :down))
 #+end_src
+
+*** Syncthing
+#+begin_src lisp
+  (defvar *syncthing-p* nil
+    "Keeps track of Syncthing execution, off by default on startup")
+
+  (defcommand start-syncthing () ()
+    "Launch Syncthing if it is not already running"
+    (if *syncthing-p*
+        (message "Syncthing is already running")
+        (progn
+          (run-shell-command "syncthing --no-browser &")
+          (setf *syncthing-p* t)
+          (message "Launching ^6Syncthing^n..."))))
+
+  (defcommand stop-syncthing () ()
+    "Stop Syncthing"
+    (stumpwm:run-shell-command "killall syncthing")
+    (setf *syncthing-p* nil)
+    (message "^6Syncthing^n is now stopped."))
+
+  (defcommand toggle-syncthing () ()
+    (if *syncthing-p*
+        (run-commands "stop-syncthing")
+        (run-commands "start-syncthing")))
+
+  ;; modeline status
+
+  (defun get-syncthing-status ()
+    (if *syncthing-p*
+        (setf *syncthing-ml-status*
+              (format nil "^6^f1^f0^n "))
+        (setf *syncthing-ml-status* "")))
+
+  (defun ml-fmt-syncthing-status (ml)
+    (declare (ignore ml))
+    (get-syncthing-status))
+
+  (add-screen-mode-line-formatter #\s #'ml-fmt-syncthing-status)
+#+end_src
+
+** Files
+#+begin_src lisp
+  (al/load "keymaps")
+  (al/load "modules")
+  (al/load "themes")
+#+end_src
+
+** TODO Modules
+See [[file:modules.org][Modules]].
+
+** Keymaps
+Keymaps to handle modules.
+See [[file:keymaps.org][Keymaps]].
 
 ** Runners
 This section gathers all the program wrappers.

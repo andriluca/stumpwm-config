@@ -235,54 +235,41 @@ This section gathers all the program wrappers.
   (defcommand editor () ()
     "run emacs"
     (run-or-raise "emacsclient -c" '(:class "Emacs")))
+  ;; Browsers
   (defcommand browser () ()
     "run firefox"
     (run-or-raise "firefox" '(:class "firefox")))
+  (defcommand nyxt () ()
+    "run nyxt"
+    (run-or-raise "nyxt" '(:class "Nyxt")))
+  (defcommand brave () ()
+    "run brave"
+    (run-or-raise "brave" '(:class "Brave")))
+  ;; News
+  (defcommand newsboat () ()
+    "run `newsboat`"
+    (run-or-raise "alacritty -T 'newsboat' -e 'newsboat'" '(:title "newsboat")))
+  ;; Office
+  (defcommand libreoffice () ()
+    "run LibreOffice"
+    (run-or-raise "libreoffice7.6" '(:class "LibreOffice")))
+  ;; Engineering
+  (defcommand matlab () ()
+    (run-or-raise "/usr/local/MATLAB/R2023a/bin/matlab" '(:class "MATLAB")))
+  ;; Study and research
+  (defcommand sioyek () ()
+    "run `sioyek`"
+    (run-or-raise "sioyek" '(:class "sioyek")))
 #+end_src
 
 ** TODO Themes
-*** TODO Current theme
-Aggiungere anche i colori di modus-theme-tinted.  L'ordine dei colori
-è indicato dalla documentazione di stumpwm e segue uno standard.
-#+begin_src lisp
-    (setf *colors*
-          '(
-            "#131220"        ; ^1 ; Dark Blue
-            "#f72f33"        ; ^6 ; Red
-            "#689d6a"        ; ^4 ; Light Green
-            "#fabd2f"        ; ^3 ; Yellow / Help map keys
-            "#62bfef"        ; ^4 ; Light Blue
-            "#ff99ff"        ; ^2 ; Magenta
-            ;; "#a644bf"     ;    ; Old magenta
-            "#56b6c2"
-            "#cc4a0e"        ; ^7 ; Brown
-            "#ffffff"        ; ^0 ; White
-            ))      ; ^8 ; Cyan 
-#+end_src
-
-*** Other themes
-#+begin_src lisp
-  ;;; Theme
-  ;;; Gavin Freeborn
-  ;; (setf *colors*
-  ;;       '("#000000"   ;black
-  ;;         "#BF6262"   ;red
-  ;;         "#a1bf78"   ;green
-  ;;         "#dbb774"   ;yellow
-  ;;         "#7D8FA3"   ;blue
-  ;;         "#ff99ff"   ;magenta
-  ;;         "#53cdbd"   ;cyan
-  ;;         "#ffffff")) ;white
-#+end_src
+See [[file:themes.org][Themes]].
 
 * TODO APPEAREANCE
 Changing themes for the various graphical components. Fare il merge con theme fuori.
 ** Parameters
 #+begin_src lisp
   ;; Input box
-  ;; (defparameter *msg-bg-color*     (nth 1 *colors*))
-  ;; (defparameter *msg-fg-color*     (nth 0 *colors*))
-  ;; (defparameter *msg-border-color* (nth 2 *colors*))
   (defparameter *msg-bg-color*     (nth 0 *colors*))
   (defparameter *msg-fg-color*     (nth 8 *colors*))
   (defparameter *msg-border-color* (nth 5 *colors*))
@@ -686,36 +673,38 @@ Sistemare pomodoro timer.
 #+begin_src lisp
   (setf 
    ;; format
-   ,*window-format*                "%m%s%20t"
+   ,*window-format*                       "%m%s%20t"
    ;; gravities
-   ,*message-window-gravity*       :center
-   ,*message-window-input-gravity* :center
-   ,*input-window-gravity*         :center
-   ,*input-window-input-gravity*   :center
+   ,*message-window-gravity*              :center
+   ,*message-window-input-gravity*        :center
+   ,*input-window-gravity*                :center
+   ,*input-window-input-gravity*          :center
    ;; border style
-   ,*window-border-style*          :thin
+   ,*window-border-style*                 :thin
    ;; border width
-   ,*message-window-padding* 3
-   ,*maxsize-border-width*   3
-   ,*normal-border-width*    3
-   ,*transient-border-width* 3
-   stumpwm::*float-window-border*       2
-   stumpwm::*float-window-title-height* 2)
+   ,*message-window-padding*              3
+   ,*maxsize-border-width*                3
+   ,*normal-border-width*                 3
+   ,*transient-border-width*              3
+   ,*float-window-border*                 2
+   ,*float-window-title-height*           2)
 
-  (clear-window-placement-rules)
 #+end_src
 *** Window Placements
 #+begin_src lisp
+  ;; Clearing window placement rules
+  (clear-window-placement-rules)
   ;; Work
-  (define-frame-preference "dev"
+  (define-frame-preference *group-dev*
     ;; frame raise lock (lock AND raise == jumpto)
-    (0 t t :class "Emacs")
-    (1 t t :class "Alacritty"))
+    (      0     t  nil    :class "Emacs")
+    (      1     t  nil    :class "Alacritty"))
   ;; Read
-  (define-frame-preference "read"
-    (0 t t :class "sioyek"))
+  (define-frame-preference *group-read*
+    (      0     t    t    :class "sioyek"))
   ;; Web
-  (define-frame-preference "web"
-    (0 t t :class "firefox"))
+  (define-frame-preference *group-web*
+    (      0     t    t    :class "firefox"))
+  (define-frame-preference *group-relax*
+    (      0     t    t    :title "newsboat"))
 #+end_src
-

@@ -22,8 +22,6 @@
   - [[#desktop-background][Desktop background]]
   - [[#fonts][Fonts]]
   - [[#gaps][Gaps]]
-  - [[#messageinput-box][Message/input box]]
-  - [[#modeline][Modeline]]
   - [[#messageinput-box][Message/Input box]]
   - [[#startup-message][Startup message]]
   - [[#which-key][Which-key]]
@@ -41,7 +39,9 @@
   - [[#completion][Completion]]
   - [[#input-devices][Input Devices]]
   - [[#messageinput-box-1][Message/Input box]]
+  - [[#modeline][Modeline]]
   - [[#session][Session]]
+  - [[#startup][Startup]]
   - [[#windows][Windows]]
 
 * TODO INITIALIZATIONS
@@ -642,40 +642,27 @@ Multiple definitions, fix.
   (run-shell-command "xsetroot -cursor_name left_ptr")
 #+end_src
 
-** Message box
+** Message/Input box
 #+begin_src lisp
+  (update-color-map (current-screen))
   ;; message timeout
   (setf *timeout-wait* 3)
 #+end_src
 
-** Modeline
+** TODO Modeline
+Sistemare pomodoro timer.
+
 #+begin_src lisp
+  (setf *mode-line-background-color*  *mode-line-bg-color* ; background
+        ,*mode-line-foreground-color* *mode-line-fg-color* ; foreground
+        ,*mode-line-border-color*     *mode-line-bg-color* ; border
+        ,*time-modeline-string*       "^6^f1^f0^n %A, %d %B ^6^f1^f0^n %H:%M" ; time format string
+        ,*mode-line-timeout*          5                    ; timeout (mode-line refresh)
+        ,*mode-line-border-width*     3                    ; border width
+        ,*mode-line-pad-x*            3                    ; text padding in x
+        ,*mode-line-pad-y*            3)                   ; text padding in y
+
   ;; Ordine di comparsa
-  (setf *mode-line-background-color* *mode-line-bg-color*
-        ,*mode-line-foreground-color* *mode-line-fg-color*
-        ,*mode-line-border-color* *mode-line-bg-color*
-        ,*mode-line-timeout* 5
-        ,*mode-line-border-width* 3
-        ,*mode-line-pad-x* 3
-        ,*mode-line-pad-y* 3
-        ,*screen-mode-line-format* (list "[" '(:eval (RUN-SHELL-COMMAND "date '+%F %H:%M'|tr -d [:cntrl:]" T)) "] [%n]  %w ^>""[%B] [luca@%h] %T"))
-
-  ;; Mostra la barra
-  (mode-line)
-
-  ;; (setf stumpwm:*screen-mode-line-format*
-  ;;       (list "^7[^B^4%n^7^b]"
-  ;; 	    " %v"
-  ;; 	    "^>"                        ; Push right
-  ;; 	    ;;	    " | %I"
-  ;; 	    " | NET: %l"
-  ;; 	    " | %M"
-  ;; 	    " | %E"
-  ;; 	    " | BAT: %B"
-  ;; 	    " | CLK: %d")
-  ;;       *mode-line-pad-y* 3
-  ;;       *mode-line-pad-x* 15)
-#+end_src
 
 ** Session
 #+begin_src lisp

@@ -1,0 +1,248 @@
+#+TITLE: Keybindings and Keymaps
+#+AUTHOR: Luca Andriotto
+#+PROPERTY: header-args :tangle keys.lisp
+#+auto_tangle: t
+#+DESCRIPTION: Keybindings e Keymaps per StumpWM.
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* PREFIX KEY
+This is the prefix key i normally use.
+#+begin_src lisp
+  (set-prefix-key (kbd "C-t"))
+#+end_src
+
+* KEYMAPS
+** Exchanging window position
+#+begin_src lisp
+  (in-package :stumpwm)
+
+  (defvar *al/exchange-window-map*
+    (let ((m (make-sparse-keymap)))
+      (define-key m (kbd "n") "exchange-direction left")
+      (define-key m (kbd "e") "exchange-direction down")
+      (define-key m (kbd "o") "exchange-direction up")
+      (define-key m (kbd "i") "exchange-direction right")
+      m ; NOTE: this is important
+      ))
+#+end_src
+
+** Resizing windows
+#+begin_src lisp
+  (define-interactive-keymap (iresize tile-group)  (:on-enter #'setup-iresize
+                                                    :on-exit #'resize-unhide
+                                                    :abort-if #'abort-resize-p)
+    ((kbd "o") "resize-direction up")
+    ((kbd "e") "resize-direction down")
+    ((kbd "n") "resize-direction left")
+    ((kbd "i") "resize-direction right"))
+#+end_src
+
+** Pomodoro 
+#+begin_src lisp
+  (defvar *al/pomodoro-bindings*
+    (let ((m (make-sparse-keymap)))
+      (define-key m (kbd "c") "pomodoro-cancel-timer")
+      (define-key m (kbd "p") "pomodoro-status")
+      (define-key m (kbd "r") "pomodoro-reset")
+      (define-key m (kbd "s") "pomodoro-start-timer")
+      m ; NOTE: this is important
+    ))
+#+end_src
+
+* KEYBINDINGS
+Listed alphabetically (with respect to the keybinding). I would like to create a map or a menu for pomodoro timer.
+** Applications
+#+begin_src lisp
+  ;; audio
+  (define-key *root-map* (kbd "a") "exec alacritty -e alsamixer")
+  ;; alert me
+  (define-key *top-map* (kbd "s-a") "alert-me-at")
+  ;; browser
+  (define-key *root-map* (kbd "b") "browser")
+  ;; terminal
+  (define-key *root-map* (kbd "c") "exec alacritty")
+  ;; launcher
+  ;; (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack' -nb '#0d0e1c' -nf '#ffffff' -sb '#4a4f69'")
+  (define-key *root-map* (kbd "d") "exec stumpwm-dmenu_run")
+  ;; text editor
+  (define-key *root-map* (kbd "e") "editor")
+  ;; file manager (graphical)
+  (define-key *root-map* (kbd "f") "exec pcmanfm")
+  ;; file manager
+  (define-key *root-map* (kbd "F") "exec alacritty -e lf")
+  ;; g *GROUP-MAP* don't touch
+  ;; h *HELP-MAP*  don't touch
+  ;; i sioyek
+  (define-key *root-map* (kbd "i") "sioyek")
+  ;; j todo
+  ;; k DELETE-WINDOW don't touch
+  ;; l fix?
+  (define-key *root-map* (kbd "l") "show-menu")
+  ;; m lastmsg don't touch
+  ;; n pull-hidden-next don't touch
+  (define-key *root-map* (kbd "n") "newsboat")
+  ;; o fnext don't touch
+  ;; p pull-hidden-previous don't touch
+  ;; P
+  ;; s-p
+  (define-key *top-map* (kbd "s-p") '*al/pomodoro-bindings*)
+  ;; q quit-confirm don't touch
+  ;; r iresize don't touch
+  ;; R don't touch
+  ;; s vsplit
+  ;; s-s slynk
+  ;; S hsplit
+  ;; s-S syncthing
+  (define-key *top-map* (kbd "s-S") "toggle-syncthing")
+  ;; t don't touch
+  ;; u todo
+  ;; v todo
+  ;; w todo
+  ;; x *EXCHANGE-WINDOW-MAP* don't touch
+  ;; y todo
+  ;; z todo
+  (define-key *root-map* (kbd "RET") "exec alacritty")
+#+end_src
+
+** Backlight
+Controlling brightness.
+#+begin_src lisp
+  (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
+  (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
+#+end_src
+
+** Buffers
+Handling hidden buffers behind frames.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-N") "pull-hidden-next")
+  (define-key *top-map* (kbd "s-P") "pull-hidden-previous")
+  (define-key *top-map* (kbd "s-S-SPC") "pull-hidden-next")
+#+end_src
+
+** Layout
+#+begin_src lisp
+  ;; Splitting
+  (define-key *top-map* (kbd "s-s") "al/vsplit")
+  (define-key *top-map* (kbd "s-h") "al/hsplit")
+
+  (define-key *top-map* (kbd "s-r") "remove")
+  (define-key *top-map* (kbd "s-R") "iresize")
+
+  (define-key *top-map* (kbd "s-q") "only")
+
+  ;; Resizing
+  (define-key *top-map* (kbd "s-z") "iresize")
+
+  ;; keyboard layout
+  (define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
+#+end_src
+
+** Movement
+*** Groups
+Handling jumping from one group to another with or without windows.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-`") "grouplist")
+
+  (define-key *top-map* (kbd "s-C-n") "gselect 1")
+  (define-key *top-map* (kbd "s-C-e") "gselect 2")
+  (define-key *top-map* (kbd "s-C-o") "gselect 3")
+  (define-key *top-map* (kbd "s-C-i") "gselect 4")
+
+  (define-key *top-map* (kbd "s-C-N") "gmove-and-follow 1")
+  (define-key *top-map* (kbd "s-C-E") "gmove-and-follow 2")
+  (define-key *top-map* (kbd "s-C-O") "gmove-and-follow 3")
+  (define-key *top-map* (kbd "s-C-I") "gmove-and-follow 4")
+#+end_src
+
+*** Windows
+Shifting focus on windows being on different frames and moving them
+around.
+
+#+begin_src lisp
+  (define-key *top-map* (kbd "s-x") '*al/exchange-window-map*)
+
+  (define-key *top-map* (kbd "s-n") "move-focus left")
+  (define-key *top-map* (kbd "s-e") "move-focus down")
+  (define-key *top-map* (kbd "s-o") "move-focus up")
+  (define-key *top-map* (kbd "s-i") "move-focus right")
+
+  (define-key *top-map* (kbd "s-N") "move-window left")
+  (define-key *top-map* (kbd "s-E") "move-window down")
+  (define-key *top-map* (kbd "s-O") "move-window up")
+  (define-key *top-map* (kbd "s-I") "move-window right")
+#+end_src
+** Search
+Managing the interfaces to different sources for information research.
+#+begin_src lisp
+;; Various search
+(make-web-jump "archlinux"  "firefox https://wiki.archlinux.org/title/")
+(make-web-jump "duckduckgo" "firefox https://duckduckgo.com/?q=")
+(make-web-jump "libgen"     "firefox http://libgen.li/index.php?req=")
+(make-web-jump "wikipedia"  "firefox http://www.wikipedia.org/wiki/")
+
+;; C-t M-s is a terrble binding, but you get the idea.
+;; Browse somewhere
+(define-key *root-map* (kbd "M-a") "archlinux")
+(define-key *root-map* (kbd "M-b") "colon1 exec firefox http://www.")
+(define-key *root-map* (kbd "M-s") "duckduckgo")
+(define-key *root-map* (kbd "M-S") "libgen")
+;; Browse somewhere
+(define-key *root-map* (kbd "M-u") "colon1 exec firefox http://www.")
+(define-key *root-map* (kbd "M-w") "wikipedia")
+#+end_src
+** System
+Keybindings for managing system.
+#+begin_src lisp
+  ;; C-a todo
+  ;; C-b banish don't touch
+  (define-key *top-map* (kbd "s-b") "mode-line")
+  ;; C-c todo
+  ;; C-d todo
+  ;; C-e todo
+  ;;(define-key *top-map* (kbd "s-e") "gnext-with-window")
+  ;; Fullscreen
+  (define-key *root-map* (kbd "C-f") "fullscreen")
+  (define-key *top-map* (kbd "s-f") "fullscreen")
+  ;; C-g don't touch
+  (define-key *top-map* (kbd "s-g") "al/toggle-golden-ratio")
+  ;; C-h don't touch
+  ;; C-i todo
+  ;;(define-key *top-map* (kbd "s-i") "gnext")
+  ;; C-j todo
+  ;; C-k don't touch (fix?)
+  ;; Lock screen
+  (define-key *root-map* (kbd "C-l") "exec slock")
+  ;; C-m fix, todo
+  ;; C-n don't touch
+  ;;(define-key *top-map* (kbd "s-n") "gprev")
+  ;; Cycling groups
+  (define-key *root-map* (kbd "C-o") "gnext")
+  (define-key *root-map* (kbd "C-O") "gnext-with-window")
+  ;;(define-key *top-map* (kbd "s-o") "gprev-with-window")
+  ;; C-p don't touch
+  ;; C-q todo
+  (define-key *root-map* (kbd "C-q") "logout")
+  ;; C-r todo
+  (define-key *root-map* (kbd "C-r") "restart-computer")
+  ;; C-s
+  (define-key *root-map* (kbd "C-s") "shutdown-computer")
+  (define-key *top-map* (kbd "s-l") "toggle-slynk")
+  ;; C-t don't touch
+  ;; C-u
+  ;; C-v
+  ;; C-w
+  ;; C-x
+  ;; C-y
+  ;; C-z
+  ;; .
+#+end_src
+** Volume
+#+begin_src lisp
+  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "amixer-master-1+")
+  (define-key *top-map* (kbd "XF86AudioLowerVolume") "amixer-master-1-")
+  (define-key *top-map* (kbd "XF86AudioMute")        "amixer-master-toggle")
+#+end_src
+

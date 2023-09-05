@@ -1,0 +1,57 @@
+#+TITLE: Settings
+#+AUTHOR: Luca Andriotto
+#+PROPERTY: header-args :tangle settings.lisp
+#+auto_tangle: t
+#+DESCRIPTION: Impostazioni di sistema e dispositivi.
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* GROUPS
+#+begin_src lisp
+  (in-package :stumpwm)
+
+  ;; creating groups
+  (setf *group-web*   "^f1    ^f0")
+  (setf *group-dev*   "^f1    ^f0")
+  (setf *group-read*  "^f1    ^f0")
+  (setf *group-relax* "^f1    ^f0")
+
+  ;; web
+  (setf (group-name (first (screen-groups (current-screen)))) *group-web*)
+  ;; dev
+  (gnewbg *group-dev*)
+  ;; read
+  (gnewbg *group-read*)
+  ;; relax
+  (gnewbg *group-relax*)
+
+  (setf *group-format* "%t")
+#+end_src
+
+* COMPLETION
+#+begin_src lisp
+  (setf *input-completion-show-empty* t)
+  #+end_src
+
+* INPUT DEVICES
+** Keyboard
+#+begin_src lisp
+  ;; Set keyboard layout
+  (setf kbd-layouts:*caps-lock-behavior* :swapped)
+  (kbd-layouts:keyboard-layout-list "us -variant workman" "it")
+#+end_src
+** Mouse (Trackpad)
+#+begin_src lisp
+  ;; Focus Follow Mouse
+  (setf *mouse-focus-policy* :click)
+  ;; bugfix for scrolling doesn't work with an external mouse in GTK+3 Apps
+  (setf (getenv "GDK_CORE_DEVICE_EVENTS") "1")
+  ;; mouse pointer
+  (run-shell-command "xsetroot -cursor_name left_ptr")
+  
+  (setq
+   ,*grab-pointer-character* 40
+   ,*grab-pointer-character-mask* 41
+   ,*grab-pointer-foreground* (hex-to-xlib-color "#3db270")
+   ,*grab-pointer-background* (hex-to-xlib-color "#2c53ca"))
+#+end_src

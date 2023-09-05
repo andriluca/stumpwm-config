@@ -8,7 +8,6 @@
 
 * Table of Contents :toc:
 - [[#initializations][INITIALIZATIONS]]
-  - [[#groups][Groups]]
   - [[#variables][Variables]]
   - [[#modularity][Modularity]]
   - [[#system-helpers][System Helpers]]
@@ -26,19 +25,7 @@
   - [[#messageinput-box][Message/Input box]]
   - [[#startup-message][Startup message]]
   - [[#which-key][Which-key]]
-- [[#keybindings][KEYBINDINGS]]
-  - [[#applications][Applications]]
-  - [[#backlight][Backlight]]
-  - [[#buffers][Buffers]]
-  - [[#layout][Layout]]
-  - [[#movement][Movement]]
-  - [[#search][Search]]
-  - [[#system][System]]
-  - [[#volume][Volume]]
 - [[#settings][SETTINGS]]
-  - [[#prefix-key][Prefix key]]
-  - [[#completion][Completion]]
-  - [[#input-devices][Input Devices]]
   - [[#messageinput-box-1][Message/Input box]]
   - [[#modeline][Modeline]]
   - [[#session][Session]]
@@ -46,31 +33,11 @@
   - [[#windows][Windows]]
 
 * TODO INITIALIZATIONS
-** Groups
-#+begin_src lisp
-  (in-package :stumpwm)
-
-  ;; creating groups
-  (setf *group-web*   "^f1    ^f0")
-  (setf *group-dev*   "^f1    ^f0")
-  (setf *group-read*  "^f1    ^f0")
-  (setf *group-relax* "^f1    ^f0")
-
-  ;; web
-  (setf (group-name (first (screen-groups (current-screen)))) *group-web*)
-  ;; dev
-  (gnewbg *group-dev*)
-  ;; read
-  (gnewbg *group-read*)
-  ;; relax
-  (gnewbg *group-relax*)
-
-  (setf *group-format* "%t")
-#+end_src
-
 ** Variables
 *** Directories
 #+begin_src lisp
+  (in-package :stumpwm)
+
   (defvar al/init-directory
     (directory-namestring
      (truename (merge-pathnames
@@ -216,8 +183,9 @@ Focus the created frame.
 
 ** Files
 #+begin_src lisp
-  (al/load "keymaps")
   (al/load "modules")
+  (al/load "settings")
+  (al/load "keys")
   (al/load "themes")
 #+end_src
 
@@ -340,234 +308,10 @@ Allowing gaps for better aesthetics.
 ** Which-key
 #+begin_src lisp
   ;; (setf *key-seq-color* "^3")
-  ;; (setf *which-key-format* "~3a -> ~a")
-#+end_src
-
-* KEYBINDINGS
-Listed alphabetically (with respect to the keybinding). I would like to create a map or a menu for pomodoro timer.
-** Applications
-#+begin_src lisp
-  ;; audio
-  (define-key *root-map* (kbd "a") "exec alacritty -e alsamixer")
-  ;; alert me
-  (define-key *top-map* (kbd "s-a") "alert-me-at")
-  ;; browser
-  (define-key *root-map* (kbd "b") "browser")
-  ;; terminal
-  (define-key *root-map* (kbd "c") "exec alacritty")
-  ;; launcher
-  ;; (define-key *root-map* (kbd "d") "exec dmenu_run -l 10 -p 'What program?' -fn 'Hack' -nb '#0d0e1c' -nf '#ffffff' -sb '#4a4f69'")
-  (define-key *root-map* (kbd "d") "exec stumpwm-dmenu_run")
-  ;; text editor
-  (define-key *root-map* (kbd "e") "editor")
-  ;; file manager (graphical)
-  (define-key *root-map* (kbd "f") "exec pcmanfm")
-  ;; file manager
-  (define-key *root-map* (kbd "F") "exec alacritty -e lf")
-  ;; g *GROUP-MAP* don't touch
-  ;; h *HELP-MAP*  don't touch
-  ;; i sioyek
-  (define-key *root-map* (kbd "i") "sioyek")
-  ;; j todo
-  ;; k DELETE-WINDOW don't touch
-  ;; l fix?
-  (define-key *root-map* (kbd "l") "show-menu")
-  ;; m lastmsg don't touch
-  ;; n pull-hidden-next don't touch
-  (define-key *root-map* (kbd "n") "newsboat")
-  ;; o fnext don't touch
-  ;; p pull-hidden-previous don't touch
-  ;; P
-  ;; s-p
-  (define-key *top-map* (kbd "s-p") '*al/pomodoro-bindings*)
-  ;; q quit-confirm don't touch
-  ;; r iresize don't touch
-  ;; R don't touch
-  ;; s vsplit
-  ;; s-s slynk
-  ;; S hsplit
-  ;; s-S syncthing
-  (define-key *top-map* (kbd "s-S") "toggle-syncthing")
-  ;; t don't touch
-  ;; u todo
-  ;; v todo
-  ;; w todo
-  ;; x *EXCHANGE-WINDOW-MAP* don't touch
-  ;; y todo
-  ;; z todo
-  (define-key *root-map* (kbd "RET") "exec alacritty")
-#+end_src
-
-** Backlight
-Controlling brightness.
-#+begin_src lisp
-  (define-key *root-map* (kbd "XF86MonBrightnessUp") "backlight-increase")
-  (define-key *root-map* (kbd "XF86MonBrightnessDown") "backlight-decrease")
-#+end_src
-
-** Buffers
-Handling hidden buffers behind frames.
-
-#+begin_src lisp
-  (define-key *top-map* (kbd "s-N") "pull-hidden-next")
-  (define-key *top-map* (kbd "s-P") "pull-hidden-previous")
-  (define-key *top-map* (kbd "s-S-SPC") "pull-hidden-next")
-#+end_src
-
-** Layout
-#+begin_src lisp
-  ;; Splitting
-  (define-key *top-map* (kbd "s-s") "al/vsplit")
-  (define-key *top-map* (kbd "s-h") "al/hsplit")
-
-  (define-key *top-map* (kbd "s-r") "remove")
-  (define-key *top-map* (kbd "s-R") "iresize")
-
-  (define-key *top-map* (kbd "s-q") "only")
-
-  ;; Resizing
-  (define-key *top-map* (kbd "s-z") "iresize")
-
-  ;; keyboard layout
-  (define-key *top-map* (kbd "s-SPC") "switch-keyboard-layout")
-#+end_src
-
-** Movement
-*** Groups
-Handling jumping from one group to another with or without windows.
-
-#+begin_src lisp
-  (define-key *top-map* (kbd "s-`") "grouplist")
-
-  (define-key *top-map* (kbd "s-C-n") "gselect 1")
-  (define-key *top-map* (kbd "s-C-e") "gselect 2")
-  (define-key *top-map* (kbd "s-C-o") "gselect 3")
-  (define-key *top-map* (kbd "s-C-i") "gselect 4")
-
-  (define-key *top-map* (kbd "s-C-N") "gmove-and-follow 1")
-  (define-key *top-map* (kbd "s-C-E") "gmove-and-follow 2")
-  (define-key *top-map* (kbd "s-C-O") "gmove-and-follow 3")
-  (define-key *top-map* (kbd "s-C-I") "gmove-and-follow 4")
-#+end_src
-
-*** Windows
-Shifting focus on windows being on different frames and moving them
-around.
-
-#+begin_src lisp
-  (define-key *top-map* (kbd "s-x") '*al/exchange-window-map*)
-
-  (define-key *top-map* (kbd "s-n") "move-focus left")
-  (define-key *top-map* (kbd "s-e") "move-focus down")
-  (define-key *top-map* (kbd "s-o") "move-focus up")
-  (define-key *top-map* (kbd "s-i") "move-focus right")
-
-  (define-key *top-map* (kbd "s-N") "move-window left")
-  (define-key *top-map* (kbd "s-E") "move-window down")
-  (define-key *top-map* (kbd "s-O") "move-window up")
-  (define-key *top-map* (kbd "s-I") "move-window right")
-#+end_src
-** Search
-Managing the interfaces to different sources for information research.
-#+begin_src lisp
-;; Various search
-(make-web-jump "archlinux"  "firefox https://wiki.archlinux.org/title/")
-(make-web-jump "duckduckgo" "firefox https://duckduckgo.com/?q=")
-(make-web-jump "libgen"     "firefox http://libgen.li/index.php?req=")
-(make-web-jump "wikipedia"  "firefox http://www.wikipedia.org/wiki/")
-
-;; C-t M-s is a terrble binding, but you get the idea.
-;; Browse somewhere
-(define-key *root-map* (kbd "M-a") "archlinux")
-(define-key *root-map* (kbd "M-b") "colon1 exec firefox http://www.")
-(define-key *root-map* (kbd "M-s") "duckduckgo")
-(define-key *root-map* (kbd "M-S") "libgen")
-;; Browse somewhere
-(define-key *root-map* (kbd "M-u") "colon1 exec firefox http://www.")
-(define-key *root-map* (kbd "M-w") "wikipedia")
-#+end_src
-** System
-Keybindings for managing system.
-#+begin_src lisp
-  ;; C-a todo
-  ;; C-b banish don't touch
-  (define-key *top-map* (kbd "s-b") "mode-line")
-  ;; C-c todo
-  ;; C-d todo
-  ;; C-e todo
-  ;;(define-key *top-map* (kbd "s-e") "gnext-with-window")
-  ;; Fullscreen
-  (define-key *root-map* (kbd "C-f") "fullscreen")
-  (define-key *top-map* (kbd "s-f") "fullscreen")
-  ;; C-g don't touch
-  (define-key *top-map* (kbd "s-g") "al/toggle-golden-ratio")
-  ;; C-h don't touch
-  ;; C-i todo
-  ;;(define-key *top-map* (kbd "s-i") "gnext")
-  ;; C-j todo
-  ;; C-k don't touch (fix?)
-  ;; Lock screen
-  (define-key *root-map* (kbd "C-l") "exec slock")
-  ;; C-m fix, todo
-  ;; C-n don't touch
-  ;;(define-key *top-map* (kbd "s-n") "gprev")
-  ;; Cycling groups
-  (define-key *root-map* (kbd "C-o") "gnext")
-  (define-key *root-map* (kbd "C-O") "gnext-with-window")
-  ;;(define-key *top-map* (kbd "s-o") "gprev-with-window")
-  ;; C-p don't touch
-  ;; C-q todo
-  (define-key *root-map* (kbd "C-q") "logout")
-  ;; C-r todo
-  (define-key *root-map* (kbd "C-r") "restart-computer")
-  ;; C-s
-  (define-key *root-map* (kbd "C-s") "shutdown-computer")
-  (define-key *top-map* (kbd "s-l") "toggle-slynk")
-  ;; C-t don't touch
-  ;; C-u
-  ;; C-v
-  ;; C-w
-  ;; C-x
-  ;; C-y
-  ;; C-z
-  ;; .
-#+end_src
-** Volume
-#+begin_src lisp
-  (define-key *top-map* (kbd "XF86AudioRaiseVolume") "amixer-master-1+")
-  (define-key *top-map* (kbd "XF86AudioLowerVolume") "amixer-master-1-")
-  (define-key *top-map* (kbd "XF86AudioMute")        "amixer-master-toggle")
+  ;; (setf *which-key-format* "^5~5a -> ^n~a")
 #+end_src
 
 * SETTINGS
-** Prefix key
-This is the prefix key i normally use.
-#+begin_src lisp
-  (set-prefix-key (kbd "C-t"))
-#+end_src
-
-** Completion
-#+begin_src lisp
-  (setf *input-completion-show-empty* t)
-  #+end_src
-
-** Input Devices
-*** Keyboard
-#+begin_src lisp
-  ;; Set keyboard layout
-  (setf kbd-layouts:*caps-lock-behavior* :swapped)
-  (kbd-layouts:keyboard-layout-list "us -variant workman" "it")
-#+end_src
-*** Mouse (Trackpad)
-#+begin_src lisp
-  ;; Focus Follow Mouse
-  (setf *mouse-focus-policy* :click)
-  ;; bugfix for scrolling doesn't work with an external mouse in GTK+3 Apps
-  (setf (getenv "GDK_CORE_DEVICE_EVENTS") "1")
-  ;; mouse pointer
-  (run-shell-command "xsetroot -cursor_name left_ptr")
-#+end_src
-
 ** Message/Input box
 #+begin_src lisp
   (update-color-map (current-screen))
@@ -582,7 +326,7 @@ Sistemare pomodoro timer.
   (setf *mode-line-background-color*  *mode-line-bg-color* ; background
         ,*mode-line-foreground-color* *mode-line-fg-color* ; foreground
         ,*mode-line-border-color*     *mode-line-bg-color* ; border
-        ,*time-modeline-string*       "^6^f1^f0^n %A, %e %B ^6^f1^f0^n %H:%M" ; time format string
+        ,*time-modeline-string*       "^6^f1^f0^n %d %B (%A) ^6^f1^f0^n %H:%M" ; time format string
         ,*mode-line-timeout*          5                    ; timeout (mode-line refresh)
         ,*mode-line-border-width*     3                    ; border width
         ,*mode-line-pad-x*            3                    ; text padding in x

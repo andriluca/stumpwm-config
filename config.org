@@ -582,7 +582,7 @@ Sistemare pomodoro timer.
   (setf *mode-line-background-color*  *mode-line-bg-color* ; background
         ,*mode-line-foreground-color* *mode-line-fg-color* ; foreground
         ,*mode-line-border-color*     *mode-line-bg-color* ; border
-        ,*time-modeline-string*       "^6^f1^f0^n %A, %d %B ^6^f1^f0^n %H:%M" ; time format string
+        ,*time-modeline-string*       "^6^f1^f0^n %A, %e %B ^6^f1^f0^n %H:%M" ; time format string
         ,*mode-line-timeout*          5                    ; timeout (mode-line refresh)
         ,*mode-line-border-width*     3                    ; border width
         ,*mode-line-pad-x*            3                    ; text padding in x
@@ -696,15 +696,17 @@ Sistemare pomodoro timer.
   (clear-window-placement-rules)
   ;; Work
   (define-frame-preference *group-dev*
-    ;; frame raise lock (lock AND raise == jumpto)
-    (      0     t  nil    :class "Emacs")
-    (      1     t  nil    :class "Alacritty"))
+                           ;; frame raise lock (lock AND raise == jumpto)
+                           (      0     t  nil    :class "Emacs")
+                           (      1     t  nil    :class "Alacritty"))
   ;; Read
   (define-frame-preference *group-read*
-    (      0     t    t    :class "sioyek"))
+                           (      0     t    t    :class "sioyek"))
   ;; Web
   (define-frame-preference *group-web*
-    (      0     t    t    :class "firefox"))
+                           (      0     t    t    :role "browser")
+                           (      0     t    t    :class "Nyxt")
+                           )
   (define-frame-preference *group-relax*
-    (      0     t    t    :title "newsboat"))
+                           (      0     t    t    :title "newsboat"))
 #+end_src
